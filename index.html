@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#ffffff">
+<title>Bizzy — Web Summit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --accent:      #F30C5F;
+  --accent-soft: rgba(243,12,95,.09);
+  --accent-mid:  rgba(243,12,95,.20);
+  --yellow:      #F5E000;
+  --sf2:         #F7F5F1;
+  --border:      #ECEAE3;
+  --bsoft:       #F1EFE8;
+  --t1: #1A1915; --t2: #57554E; --t3: #8F8C84; --t4: #B5B2A8;
+  --font: 'Manrope', system-ui, sans-serif;
+  --rmd: 14px; --rlg: 20px; --rchat: 18px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bot: env(safe-area-inset-bottom, 0px);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { height: 100%; }
+body {
+  font-family: var(--font); color: var(--t1);
+  background: var(--sf2);
+  height: 100%; display: flex; flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── App bar (sticky top) ── */
+.abar {
+  flex-shrink: 0;
+  background: #FFF;
+  border-bottom: 1px solid var(--bsoft);
+  padding: calc(var(--safe-top) + 10px) 16px 10px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: relative; z-index: 20;
+}
+.abar-l { display: flex; align-items: center; gap: 10px; }
+.logo { width: 36px; height: 36px; border-radius: 10px; background: var(--yellow); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.logo svg { width: 20px; height: 20px; }
+.evname { font-size: 13px; font-weight: 700; color: var(--t1); line-height: 1.2; letter-spacing: -.2px; }
+.evdate { font-size: 10.5px; font-weight: 500; color: var(--t3); }
+.abar-r { display: flex; gap: 4px; align-items: center; }
+.ibtn { width: 36px; height: 36px; border-radius: 50%; border: 0; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--t1); position: relative; }
+.bell::after { content: ''; position: absolute; top: 7px; right: 7px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); border: 2px solid #FFF; }
+.ava { width: 32px; height: 32px; border-radius: 50%; background: var(--t1); color: #FFF; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; letter-spacing: .5px; }
+
+/* ── Anchor card (sticky below app bar) ── */
+.anchor-wrap {
+  flex-shrink: 0;
+  background: #FFF;
+  padding: 12px 16px 0;
+  border-bottom: 1px solid var(--bsoft);
+  position: relative; z-index: 10;
+}
+.acard { background: var(--t1); border-radius: var(--rlg); padding: 13px 15px; color: #FFF; display: flex; align-items: center; gap: 12px; margin-bottom: 12px; cursor: pointer; transition: opacity .15s; user-select: none; }
+.acard:active { opacity: .88; }
+.aicon { width: 40px; height: 40px; border-radius: 11px; background: rgba(255,255,255,.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.abody { flex: 1; min-width: 0; }
+.alabel { font-size: 9.5px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase; color: rgba(255,255,255,.45); margin-bottom: 2px; }
+.amain { font-size: 14px; font-weight: 700; letter-spacing: -.3px; line-height: 1.25; }
+.asub { font-size: 11px; font-weight: 500; color: rgba(255,255,255,.55); margin-top: 2px; }
+.acta { background: var(--accent); border: 0; color: #FFF; font-family: var(--font); font-size: 11.5px; font-weight: 700; padding: 8px 13px; border-radius: 9px; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+.acta:active { background: #d40a55; }
+
+/* ── Scrollable chat area ── */
+.cs {
+  flex: 1; overflow-y: auto; padding: 16px 0 8px;
+  display: flex; flex-direction: column;
+  -webkit-overflow-scrolling: touch;
+}
+.cs::-webkit-scrollbar { display: none; }
+
+/* ── Bizzy divider ── */
+.bdiv { display: flex; align-items: center; gap: 10px; padding: 0 16px 12px; flex-shrink: 0; }
+.bline { flex: 1; height: 1px; background: var(--border); }
+.bbadge { display: flex; align-items: center; gap: 6px; background: #FFF; border: 1px solid var(--border); border-radius: 999px; padding: 5px 10px 5px 8px; font-size: 11px; font-weight: 700; color: var(--t2); }
+.bglyph { width: 18px; height: 18px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; }
+.ldot { width: 6px; height: 6px; border-radius: 50%; background: #19C37D; display: inline-block; animation: lp 1.6s infinite; }
+@keyframes lp { 0%{box-shadow:0 0 0 0 rgba(25,195,125,.55)}70%{box-shadow:0 0 0 6px rgba(25,195,125,0)}100%{box-shadow:0 0 0 0 rgba(25,195,125,0)} }
+.rbtn { width: 28px; height: 28px; border-radius: 50%; border: 0; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--t3); }
+.rbtn:active { background: var(--sf2); color: var(--t1); }
+
+/* ── Messages ── */
+.msgs { display: flex; flex-direction: column; gap: 4px; padding: 0 16px 4px; }
+.bgreet { display: flex; align-items: flex-start; gap: 9px; padding: 0 16px 10px; }
+.bav { width: 28px; height: 28px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+.gbub { background: #FFF; border: 1px solid var(--border); border-radius: 4px var(--rchat) var(--rchat) var(--rchat); padding: 10px 13px; font-size: 13.5px; font-weight: 500; color: var(--t1); line-height: 1.5; max-width: calc(100% - 40px); }
+.bub-u { align-self: flex-end; background: var(--t1); color: #FFF; border-radius: var(--rchat) var(--rchat) 4px var(--rchat); padding: 10px 14px; font-size: 13.5px; font-weight: 500; line-height: 1.45; max-width: 82%; margin-bottom: 2px; }
+.bub-brow { display: flex; align-items: flex-start; gap: 9px; margin-bottom: 2px; }
+.bub-b { background: #FFF; border: 1px solid var(--border); border-radius: 4px var(--rchat) var(--rchat) var(--rchat); padding: 10px 13px; font-size: 13.5px; font-weight: 500; color: var(--t1); line-height: 1.5; max-width: calc(100% - 40px); }
+.bub-err { background: rgba(220,38,38,.08); border: 1px solid rgba(220,38,38,.2); border-radius: 4px var(--rchat) var(--rchat) var(--rchat); padding: 10px 13px; font-size: 13px; font-weight: 500; color: #B91C1C; line-height: 1.5; max-width: calc(100% - 40px); }
+.cwrap { padding-left: 37px; display: flex; flex-direction: column; gap: 6px; margin-bottom: 2px; }
+.chips { padding-left: 37px; display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.chip { display: inline-flex; align-items: center; gap: 5px; background: #FFF; border: 1px solid var(--border); border-radius: 999px; padding: 7px 12px; font-family: var(--font); font-size: 12px; font-weight: 600; color: var(--t1); cursor: pointer; transition: border-color .15s,background .15s; white-space: nowrap; }
+.chip:active { border-color: var(--accent-mid); background: var(--accent-soft); color: var(--accent); }
+.prow { padding: 0 16px; display: flex; flex-direction: column; gap: 6px; margin-top: 4px; margin-bottom: 8px; }
+.pchip { display: flex; align-items: center; gap: 9px; background: #FFF; border: 1px solid var(--border); border-radius: 12px; padding: 11px 14px; font-family: var(--font); font-size: 13px; font-weight: 600; color: var(--t1); cursor: pointer; text-align: left; }
+.pchip:active { border-color: var(--accent-mid); background: var(--accent-soft); }
+.picon { color: var(--accent); flex-shrink: 0; display: inline-flex; }
+.tyrow { display: flex; align-items: flex-start; gap: 9px; padding: 0 16px 8px; }
+.tybub { background: #FFF; border: 1px solid var(--border); border-radius: 4px var(--rchat) var(--rchat) var(--rchat); padding: 12px 16px; display: flex; gap: 4px; align-items: center; }
+.tybub span { width: 6px; height: 6px; border-radius: 50%; background: var(--t4); animation: tb 1.2s infinite ease-in-out; display: inline-block; }
+.tybub span:nth-child(2){animation-delay:.15s}.tybub span:nth-child(3){animation-delay:.3s}
+@keyframes tb{0%,60%,100%{transform:translateY(0);background:var(--t4)}30%{transform:translateY(-5px);background:var(--accent)}}
+.spad { height: 16px; flex-shrink: 0; }
+.cfw { background: #FFF; border: 1px solid var(--border); border-radius: var(--rmd); padding: 12px 14px; }
+.cfp { font-size: 12.5px; font-weight: 500; color: var(--t2); line-height: 1.5; margin-bottom: 10px; }
+.cfbtns { display: flex; gap: 7px; }
+.cfbtn { flex: 1; font-family: var(--font); font-size: 12.5px; font-weight: 700; padding: 9px; border-radius: 10px; border: 1px solid var(--border); background: #FFF; color: var(--t1); cursor: pointer; }
+.cfbtn.p { background: var(--t1); color: #FFF; border-color: var(--t1); }
+
+/* ── Sticky bottom bar ── */
+.bottom-bar {
+  flex-shrink: 0;
+  background: #FFF;
+  border-top: 1px solid var(--bsoft);
+  position: relative; z-index: 20;
+}
+.ibar { padding: 10px 12px 8px; display: flex; align-items: center; gap: 8px; }
+.ifield { flex: 1; background: var(--sf2); border: 1px solid var(--border); border-radius: 24px; padding: 11px 16px; font-family: var(--font); font-size: 16px; font-weight: 500; color: var(--t1); outline: none; transition: border-color .15s; -webkit-appearance: none; }
+.ifield::placeholder { color: var(--t4); }
+.ifield:focus { border-color: var(--accent-mid); }
+.sbtn { width: 42px; height: 42px; border-radius: 50%; border: 0; background: var(--accent); color: #FFF; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; box-shadow: 0 2px 8px rgba(243,12,95,.35); }
+.sbtn:active { background: #d40a55; transform: scale(.93); }
+.scbar { padding: 0 14px calc(var(--safe-bot) + 12px); display: flex; gap: 7px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.scbar::-webkit-scrollbar { display: none; }
+.scchip { display: inline-flex; align-items: center; gap: 6px; background: var(--sf2); border: 1.5px solid var(--border); border-radius: 999px; padding: 8px 14px 8px 11px; font-family: var(--font); font-size: 12.5px; font-weight: 700; color: var(--t2); cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+.scchip:active { background: var(--accent-soft); border-color: var(--accent-mid); color: var(--accent); }
+.scchip.on { background: var(--t1); border-color: var(--t1); color: #FFF; }
+.scchip svg { flex-shrink: 0; }
+
+/* ── Cards ── */
+.rc { background: #FFF; border: 1px solid var(--border); border-radius: var(--rmd); display: flex; gap: 10px; align-items: flex-start; padding: 11px 12px; cursor: pointer; }
+.rc:active { border-color: var(--accent-mid); }
+.rcph { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; flex-shrink: 0; background: var(--sf2); }
+.rcph img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.rctm { width: 40px; flex-shrink: 0; background: var(--sf2); border-radius: 10px; padding: 7px 0; display: flex; flex-direction: column; align-items: center; justify-content: center; align-self: stretch; }
+.rch { font-size: 18px; font-weight: 800; line-height: 1; color: var(--t1); }
+.rcm { font-size: 9.5px; font-weight: 600; color: var(--t3); margin-top: 2px; }
+.rcb { flex: 1; min-width: 0; }
+.rcname { font-size: 13.5px; font-weight: 700; color: var(--t1); line-height: 1.2; letter-spacing: -.2px; }
+.rcrole { font-size: 11.5px; font-weight: 500; color: var(--t2); margin-top: 2px; line-height: 1.35; }
+.rcmeta { font-size: 11px; font-weight: 500; color: var(--t3); margin-top: 3px; }
+.rctag { display: inline-flex; align-items: center; gap: 4px; font-size: 9.5px; font-weight: 700; letter-spacing: .9px; text-transform: uppercase; padding: 2px 7px; border-radius: 999px; margin-bottom: 3px; }
+.rctag-l { background: rgba(220,38,38,.10); color: #B91C1C; }
+.rctag-n { background: rgba(243,12,95,.10); color: var(--accent); }
+.rdot { width: 5px; height: 5px; border-radius: 50%; background: #DC2626; animation: rp 1.4s infinite; display: inline-block; }
+@keyframes rp{0%{box-shadow:0 0 0 0 rgba(220,38,38,.6)}70%{box-shadow:0 0 0 5px rgba(220,38,38,0)}100%{box-shadow:0 0 0 0 rgba(220,38,38,0)}}
+.rcmuts { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
+.rcmut { font-size: 10px; font-weight: 600; background: var(--accent-soft); color: var(--accent); padding: 2px 7px; border-radius: 999px; }
+.rca { flex-shrink: 0; }
+.rcbtn { font-family: var(--font); font-size: 11px; font-weight: 700; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--border); background: #FFF; color: var(--t1); cursor: pointer; white-space: nowrap; }
+.rcbtn-p { background: var(--t1); color: #FFF; border-color: var(--t1); }
+.rcbtn-a { background: var(--accent); color: #FFF; border-color: var(--accent); }
+
+/* ── Peek sheet ── */
+.pscrim { position: fixed; inset: 0; background: rgba(0,0,0,0); z-index: 30; pointer-events: none; transition: background .25s; }
+.pscrim.open { background: rgba(0,0,0,.4); pointer-events: all; }
+.psheet { position: fixed; bottom: 0; left: 0; right: 0; background: #FFF; border-radius: 24px 24px 0 0; z-index: 31; transform: translateY(100%); transition: transform .3s cubic-bezier(.32,.72,0,1); display: flex; flex-direction: column; max-height: 72%; padding-bottom: var(--safe-bot); }
+.psheet.open { transform: translateY(0); }
+.phandle { width: 36px; height: 4px; border-radius: 999px; background: var(--border); margin: 10px auto 0; flex-shrink: 0; }
+.phead { padding: 14px 18px 0; display: flex; align-items: flex-start; gap: 13px; flex-shrink: 0; }
+.pph { width: 52px; height: 52px; border-radius: 50%; overflow: hidden; flex-shrink: 0; background: var(--sf2); }
+.pph img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pphsq { width: 52px; height: 52px; border-radius: 14px; background: var(--sf2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.pinfo { flex: 1; min-width: 0; }
+.pname { font-size: 17px; font-weight: 800; letter-spacing: -.5px; line-height: 1.2; color: var(--t1); }
+.psub { font-size: 12.5px; font-weight: 500; color: var(--t2); margin-top: 3px; line-height: 1.35; }
+.ptags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 7px; }
+.ptag { font-size: 10px; font-weight: 600; background: var(--accent-soft); color: var(--accent); padding: 3px 8px; border-radius: 999px; }
+.pbody { flex: 1; overflow-y: auto; padding: 14px 18px 0; -webkit-overflow-scrolling: touch; }
+.pbody::-webkit-scrollbar { display: none; }
+.pr { display: flex; gap: 11px; padding: 9px 0; border-bottom: 1px solid var(--bsoft); align-items: flex-start; }
+.pr:last-child { border-bottom: 0; }
+.pri { width: 26px; height: 26px; border-radius: 8px; background: var(--sf2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--t2); }
+.prl { font-size: 9.5px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: var(--t3); margin-bottom: 2px; }
+.prv { font-size: 13px; font-weight: 600; color: var(--t1); }
+.prh { font-size: 11px; font-weight: 500; color: var(--t3); margin-top: 2px; }
+.pq { padding: 12px 18px 6px; font-size: 13px; font-weight: 600; color: var(--t2); flex-shrink: 0; }
+.pact { padding: 10px 16px 16px; display: flex; gap: 8px; flex-shrink: 0; border-top: 1px solid var(--bsoft); }
+.pbtn { flex: 1; font-family: var(--font); font-size: 13px; font-weight: 700; padding: 13px; border-radius: 13px; border: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.pbtn:active { opacity: .85; }
+.pbtn-p { background: var(--t1); color: #FFF; }
+.pbtn-s { background: var(--sf2); color: var(--t1); }
+.pbtn-a { background: var(--accent); color: #FFF; }
+
+/* ── Detail page ── */
+.dpage { position: fixed; inset: 0; background: #FFF; z-index: 40; display: flex; flex-direction: column; transform: translateX(100%); transition: transform .32s cubic-bezier(.32,.72,0,1); }
+.dpage.open { transform: translateX(0); }
+.dnav { display: flex; align-items: center; gap: 8px; padding: calc(var(--safe-top) + 10px) 14px 10px; background: #FFF; border-bottom: 1px solid var(--bsoft); flex-shrink: 0; }
+.dback { width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid var(--border); background: #FFF; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--t1); flex-shrink: 0; outline: none; }
+.dntitle { flex: 1; font-size: 13px; font-weight: 700; color: var(--t2); }
+.dnact { font-family: var(--font); font-size: 13px; font-weight: 700; color: var(--accent); background: transparent; border: 0; cursor: pointer; padding: 4px 8px; }
+.dscroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: var(--safe-bot); }
+.dscroll::-webkit-scrollbar { display: none; }
+.dbanner { width: 100%; height: 200px; position: relative; overflow: hidden; }
+.dbbg { position: absolute; inset: 0; }
+.dsec { padding: 16px 18px 0; }
+.dstitle { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--t3); margin-bottom: 10px; }
+.dcard { background: var(--sf2); border: 1px solid var(--border); border-radius: var(--rmd); padding: 13px 14px; }
+.dstats { display: flex; gap: 8px; margin-bottom: 16px; }
+.dstat { flex: 1; background: var(--sf2); border: 1px solid var(--border); border-radius: 12px; padding: 11px 10px; text-align: center; }
+.dsv { font-size: 20px; font-weight: 800; letter-spacing: -.5px; color: var(--t1); line-height: 1; }
+.dsl { font-size: 10px; font-weight: 600; color: var(--t3); margin-top: 3px; text-transform: uppercase; letter-spacing: .5px; }
+.dr { display: flex; gap: 10px; align-items: flex-start; padding: 9px 0; border-bottom: 1px solid var(--bsoft); }
+.dr:last-child { border-bottom: 0; }
+.dri { width: 26px; height: 26px; border-radius: 7px; background: var(--sf2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--t2); }
+.drl { font-size: 9.5px; font-weight: 700; letter-spacing: .7px; text-transform: uppercase; color: var(--t3); margin-bottom: 2px; }
+.drv { font-size: 13px; font-weight: 600; color: var(--t1); }
+.dcta { position: sticky; bottom: 0; background: rgba(255,255,255,.96); backdrop-filter: blur(12px); border-top: 1px solid var(--bsoft); padding: 10px 18px calc(var(--safe-bot) + 10px); display: flex; gap: 8px; }
+.spkchip { display: flex; align-items: center; gap: 10px; background: var(--sf2); border-radius: 12px; padding: 10px 12px; cursor: pointer; }
+.spkchip:active { background: var(--border); }
+.spkchip img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+.spkchip-name { font-size: 13px; font-weight: 700; color: var(--t1); }
+.spkchip-role { font-size: 11px; font-weight: 500; color: var(--t2); margin-top: 1px; }
+</style>
+</head>
+<body>
+
+<div class="abar">
+  <div class="abar-l">
+    <div class="logo">
+      <svg viewBox="0 0 20 20" fill="none">
+        <path d="M13.5 4.5C13.5 4.5 11 4.5 9 6.5C7 8.5 7 11.5 9 13.5C11 15.5 13.5 15.5 13.5 15.5" stroke="#1A1915" stroke-width="2.2" stroke-linecap="round"/>
+        <path d="M10 7C10 7 8.2 7 7 8.5C5.8 10 5.8 12 7 13.5C8.2 15 10 15 10 15" stroke="#1A1915" stroke-width="2.2" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div>
+      <div class="evname">Web Summit</div>
+      <div class="evdate">May 12-15 &middot; Expo Tel Aviv</div>
+    </div>
+  </div>
+  <div class="abar-r">
+    <button class="ibtn bell" aria-label="Notifications">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    </button>
+    <div class="ava">JL</div>
+  </div>
+</div>
+
+<div class="anchor-wrap" id="anchor-wrap"></div>
+
+<div class="cs" id="cs">
+  <div class="bdiv">
+    <div class="bline"></div>
+    <div class="bbadge">
+      <div class="bglyph"><svg width="10" height="10" viewBox="0 0 24 24" fill="white"><path d="M12 2L13.5 8.5L20 10L13.5 11.5L12 18L10.5 11.5L4 10L10.5 8.5Z"/></svg></div>
+      Bizzy <span class="ldot"></span>
+    </div>
+    <div class="bline"></div>
+    <button class="rbtn" id="rbtn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></button>
+  </div>
+  <div id="chat"></div>
+  <div class="spad"></div>
+</div>
+
+<div class="bottom-bar">
+  <div class="ibar">
+    <input type="text" class="ifield" id="inp" placeholder="Ask Bizzy anything..." autocomplete="off" autocorrect="off" spellcheck="false">
+    <button class="sbtn" id="sbtn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+  <div class="scbar" id="scbar"></div>
+</div>
+
+<div class="pscrim" id="pscrim"></div>
+<div class="psheet" id="psheet">
+  <div class="phandle"></div>
+  <div class="phead" id="phead"></div>
+  <div class="pbody" id="pbody"></div>
+  <div class="pq" id="pq"></div>
+  <div class="pact" id="pact"></div>
+</div>
+<div class="dpage" id="dpage">
+  <div class="dnav">
+    <button class="dback" id="dback"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+    <div class="dntitle" id="dntitle"></div>
+    <button class="dnact" id="dnact"></button>
+  </div>
+  <div class="dscroll" id="dscroll"></div>
+</div>
+
+<script>
+(function () {
+'use strict';
+function g(id) { return document.getElementById(id); }
+function e(s) { return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+var S = { lc:'live', thread:[], typing:false, asc:null };
+
+var _avs = {};
+function av(seed) {
+  if (_avs[seed]) return _avs[seed];
+  var pal=[['#F8E4CC','#B8641E','#1A1915',false],['#EDCFA0','#0E0A06','#1A4D8F',false],['#D4956A','#2C1810','#D97706',true],['#F5D5B0','#6B3A1F','#374151',false],['#C8956C','#1A1915','#16A34A',true],['#F0C8A0','#8B4513','#7C3AED',false],['#E8B88C','#4A2810','#DC2626',true],['#DCA878','#1A1915','#0891B2',false]];
+  var p=pal[seed%pal.length],sk=p[0],hr=p[1],sh=p[2],wy=p[3];
+  var hsvg=wy?'<path d="M35 44 Q48 28 60 34 Q72 28 85 44 Q90 56 85 68 Q72 46 60 44 Q48 46 35 68 Q30 56 35 44Z" fill="'+hr+'"/>':'<ellipse cx="60" cy="38" rx="26" ry="22" fill="'+hr+'"/><rect x="34" y="44" width="52" height="10" fill="'+hr+'"/>';
+  var svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120"><defs><clipPath id="cp'+seed+'"><circle cx="60" cy="60" r="60"/></clipPath></defs><g clip-path="url(#cp'+seed+')"><rect width="120" height="120" fill="#F0EDE6"/><ellipse cx="60" cy="130" rx="50" ry="34" fill="'+sh+'"/><rect x="53" y="76" width="14" height="20" rx="5" fill="'+sk+'"/><ellipse cx="35" cy="60" rx="5" ry="7" fill="'+sk+'"/><ellipse cx="85" cy="60" rx="5" ry="7" fill="'+sk+'"/>'+hsvg+'<ellipse cx="60" cy="57" rx="22" ry="24" fill="'+sk+'"/><path d="M48 47 Q52 45 56 47" stroke="'+hr+'" stroke-width="2" fill="none" stroke-linecap="round" opacity=".85"/><path d="M64 47 Q68 45 72 47" stroke="'+hr+'" stroke-width="2" fill="none" stroke-linecap="round" opacity=".85"/><ellipse cx="52" cy="54" rx="5" ry="4" fill="white"/><ellipse cx="68" cy="54" rx="5" ry="4" fill="white"/><circle cx="52" cy="54" r="3" fill="#3D2B1F"/><circle cx="68" cy="54" r="3" fill="#3D2B1F"/><circle cx="52" cy="54" r="1.6" fill="#111"/><circle cx="68" cy="54" r="1.6" fill="#111"/><circle cx="53.2" cy="52.8" r="1.1" fill="white" opacity=".9"/><circle cx="69.2" cy="52.8" r="1.1" fill="white" opacity=".9"/><path d="M54 71 Q60 75 66 71" stroke="#A0605A" stroke-width="1.8" fill="none" stroke-linecap="round"/></g></svg>';
+  _avs[seed]='data:image/svg+xml;base64,'+btoa(svg);
+  return _avs[seed];
+}
+
+var PP={
+  'Alex Chen':    {seed:1,role:'Senior PM',co:'Stripe',avail:'Free at 15:30',topics:['AI','fintech','product'],bio:'Alex leads product for Stripe Checkout. Previously at Square and Braintree.',slots:['15:30 - Networking Floor','17:00 - Booth area'],score:92,sessions:['AI in Product Design','Closing Keynote']},
+  'Dana Goldberg':{seed:3,role:'Sustainability Lead',co:'Patagonia',avail:'In Hall B now',topics:['sustainability','design','climate'],bio:'Dana drives Patagonia product sustainability roadmap. Speaker at COP28.',slots:['Now - Hall B lobby','16:30 - Networking Floor'],score:87,sessions:['Building Sustainable Cities']},
+  'Priya Shah':   {seed:5,role:'Design Lead',co:'Notion',avail:'Free after 16:00',topics:['product design','AI'],bio:'Priya leads design systems at Notion. Previously at Airbnb Design. Newsletter on design ops with 40k subscribers.',slots:['16:00 - Networking Floor','17:15 - Main Stage area'],score:84,sessions:['AI in Product Design']},
+  'Tom Reyes':    {seed:6,role:'Head of Growth',co:'Vercel',avail:'Free now',topics:['product','startups','dev tools'],bio:'Tom oversees PLG at Vercel. Previously VP Growth at Netlify. Speaks on developer-led growth at SaaStr.',slots:['14:45 - Lobby','16:00 - Sponsor Hall'],score:78,sessions:['Closing Keynote']}
+};
+var SP={
+  'Daniel Wu': {seed:2,title:'Principal Designer',co:'Figma',session:'AI in Product Design',stime:'14:30 - Hall B',bio:'Daniel leads the AI design practice at Figma. He co-created Dev Mode and is now building Figma AI.',talk:'How AI is reshaping the role of designers - live demos of Figma AI in production.',tw:'@danielwu_figma',followers:28400,talks:12,topics:['AI','product design']},
+  'Maya Levine':{seed:0,title:'Climate Researcher',co:'TAU',session:'Building Sustainable Cities',stime:'14:00 - Auditorium A',bio:'Maya is a senior researcher at TAU Urban Climate Lab. Her work on heat-resilient city planning has influenced policy in 6 countries.',talk:'Data-driven approaches to cities that survive extreme heat.',tw:'@mayalevine_tau',followers:12100,talks:7,topics:['sustainability']},
+  'Sarah Chen': {seed:4,title:'CEO',co:'Threadwise',session:'Closing Keynote',stime:'17:30 - Main Stage',bio:'Sarah founded Threadwise, the AI-native project management platform used by 1.2M teams. Forbes 30 Under 30.',talk:'The next decade of work: why async-first AI-augmented teams will outcompete everything before.',tw:'@sarahchen',followers:94000,talks:21,topics:['AI','product design','fintech']}
+};
+var SS={
+  'AI in Product Design':        {time:'14:30',room:'Hall B',tag:'next',spk:'Daniel Wu',spkSeed:2,inAgenda:true,dur:'45 min',track:'Design & Product',desc:'AI is changing every layer of the design process. Daniel Wu shows how AI moves designers from execution to intent.',learn:['How Figma AI handles layout and constraints','Prompt-to-design workflows in production','Where AI still fails'],att:312,cap:380,why:'Matches your AI and product design interests'},
+  'Building Sustainable Cities': {time:'14:00',room:'Auditorium A',tag:'live',spk:'Maya Levine',spkSeed:0,inAgenda:false,dur:'40 min',track:'Climate & Society',desc:'Urban climate researcher Maya Levine presents data-driven frameworks for designing heat-resilient cities.',learn:['Heat island mapping for urban planners','Material choices that reduce ambient temp','Policy levers that work'],att:289,cap:400,why:'Matches your sustainability interest'},
+  'Networking Mixer':            {time:'16:00',room:'Level 1 Open floor',tag:null,spk:null,spkSeed:null,inAgenda:false,dur:'90 min',track:'Networking',desc:'Structured drop-in networking with topic tables. Find the AI table, Design Systems corner, or Climate section.',learn:['Meet people in your interest areas','AI-matched introductions','No agenda, no pressure'],att:540,cap:600,why:'Great for your networking goal'},
+  'Closing Keynote':             {time:'17:30',room:'Main Stage',tag:null,spk:'Sarah Chen',spkSeed:4,inAgenda:false,dur:'50 min',track:'Keynote',desc:'Threadwise CEO Sarah Chen closes the event with a vision of AI-augmented teams in 2030.',learn:['The async-first team model at scale','How AI changes hiring and org design','Why the interface layer is still the hardest problem'],att:892,cap:1200,why:'Highly recommended for product designers'}
+};
+
+var GREET = 'AI in Product Design is starting in 23 min in Hall B and it is already on your agenda. You also have a gap at 16:00 that lines up with the Networking Mixer. Want me to show you who is going?';
+var SUGG  = ['Who should I meet?','What is happening now?','Where is Hall B?'];
+
+var ANCH = {bg:'linear-gradient(135deg,#1A1915,#0B2D80)',label:'UP NEXT',main:'AI in Product Design',sub:'Hall B - in 23 min - Daniel Wu, Figma',cta:'Navigate',q:'How do I get to Hall B?'};
+var AICON = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
+
+function renderAnchor() {
+  g('anchor-wrap').innerHTML='<div class="acard" id="acard" style="background:'+ANCH.bg+'">'
+    +'<div class="aicon">'+AICON+'</div>'
+    +'<div class="abody"><div class="alabel">'+e(ANCH.label)+'</div><div class="amain">'+e(ANCH.main)+'</div><div class="asub">'+e(ANCH.sub)+'</div></div>'
+    +'<button class="acta" id="acta">'+e(ANCH.cta)+'</button>'
+    +'</div>';
+  g('acard').addEventListener('click',function(){ask(ANCH.q);});
+  g('acta').addEventListener('click',function(ev){ev.stopPropagation();ask(ANCH.q);});
+}
+
+var SPARK='<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L13.5 8.5L20 10L13.5 11.5L12 18L10.5 11.5L4 10L10.5 8.5Z"/></svg>';
+var BAVSVG='<svg width="11" height="11" viewBox="0 0 24 24" fill="white"><path d="M12 2L13.5 8.5L20 10L13.5 11.5L12 18L10.5 11.5L4 10L10.5 8.5Z"/></svg>';
+function bav(){return '<div class="bav">'+BAVSVG+'</div>';}
+
+var SCDATA=[
+  {id:'sessions',label:"Today's sessions",ico:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>',prompt:'What sessions are on today?',resp:function(){return{intro:'Here is the full lineup for today:',cards:[{t:'session',title:'Building Sustainable Cities'},{t:'session',title:'AI in Product Design'},{t:'session',title:'Networking Mixer'},{t:'session',title:'Closing Keynote'}],chips:['Add all to agenda','What is on now?','Sessions on AI?']};}},
+  {id:'people',label:'People to meet',ico:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',prompt:'Who should I meet today?',resp:function(){return{intro:'Based on your interests in AI and design - these people are worth connecting with:',cards:[{t:'person',name:'Alex Chen'},{t:'person',name:'Priya Shah'},{t:'person',name:'Dana Goldberg'},{t:'person',name:'Tom Reyes'}],chips:['Request a meeting with Alex Chen','Who is free right now?','Designers only']};}},
+  {id:'meetings',label:'My meetings',ico:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',prompt:'Show my meetings today',resp:function(){return{intro:'You have 2 meetings scheduled today:',cards:[{t:'person',name:'Alex Chen',avail:'15:30 - Networking Floor'},{t:'person',name:'Priya Shah',avail:'16:00 - Networking Floor'}],chips:['Reschedule with Alex','Send a message to Priya','Request another meeting']};}},
+  {id:'agenda',label:'My agenda',ico:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',prompt:'Show my agenda',resp:function(){return{intro:"Here is what you have saved:",cards:[{t:'session',title:'AI in Product Design'}],chips:['What else should I add?','Sessions I might like','Clear my agenda']};}}
+];
+
+function renderSC() {
+  g('scbar').innerHTML=SCDATA.map(function(sc){return '<button class="scchip'+(S.asc===sc.id?' on':'')+'" data-sc="'+sc.id+'">'+sc.ico+e(sc.label)+'</button>';}).join('');
+  g('scbar').querySelectorAll('[data-sc]').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var id=btn.getAttribute('data-sc'), sc=SCDATA.filter(function(x){return x.id===id;})[0];
+      if (!sc||S.typing) return;
+      if (S.asc===id){S.asc=null;renderSC();return;}
+      S.asc=id; renderSC();
+      S.thread.push({role:'user',text:sc.prompt}); renderChat();
+      setTimeout(function(){S.typing=true;renderChat();setTimeout(function(){S.typing=false;var r=sc.resp();S.thread.push({role:'bizzy',text:r.intro,cards:r.cards,chips:r.chips});renderChat();},600);},120);
+    });
+  });
+}
+
+function personCard(item) {
+  var nm=item.name,r=PP[nm]||{},seed=r.seed!=null?r.seed:0,avail=item.avail||r.avail||'Attending',topics=(r.topics||[]).slice(0,3);
+  return '<div class="rc" data-ct="person" data-cn="'+e(nm)+'"><div class="rcph"><img src="'+av(seed)+'" alt=""></div><div class="rcb"><div class="rcname">'+e(nm)+'</div><div class="rcrole">'+e(r.role||'')+'&nbsp;&middot;&nbsp;'+e(r.co||'')+'</div><div class="rcmeta">'+e(avail)+'</div>'+(topics.length?'<div class="rcmuts">'+topics.map(function(t){return '<span class="rcmut">'+e(t)+'</span>';}).join('')+'</div>':'')+'</div><div class="rca"><button class="rcbtn rcbtn-p" data-meet="'+e(nm)+'">Meet</button></div></div>';
+}
+function sessionCard(item) {
+  var tl=item.title,r=SS[tl]||{},tm=r.time||'',pts=tm.split(':'),th=pts[0]||'--',tm2=pts[1]||'00',inAg=r.inAgenda||false,tag=r.tag||null;
+  var tagh=tag==='live'?'<div class="rctag rctag-l"><span class="rdot"></span>Live now</div>':tag==='next'?'<div class="rctag rctag-n">Up next</div>':'';
+  return '<div class="rc" data-ct="session" data-stitle="'+e(tl)+'"><div class="rctm"><div class="rch">'+e(th)+'</div><div class="rcm">'+e(tm2)+'</div></div><div class="rcb">'+tagh+'<div class="rcname">'+e(tl)+'</div><div class="rcrole">'+e(r.room||'')+(r.spk?' &middot; '+e(r.spk):'')+'</div></div><div class="rca"><button class="rcbtn '+(inAg?'':'rcbtn-a')+'" data-ag="'+e(tl)+'" data-ia="'+(inAg?'1':'0')+'">'+(inAg?'&#10003; Saved':'+ Add')+'</button></div></div>';
+}
+function speakerCard(item) {
+  var nm=item.name,r=SP[nm]||{},seed=r.seed!=null?r.seed:0;
+  return '<div class="rc" data-ct="speaker" data-cn="'+e(nm)+'"><div class="rcph"><img src="'+av(seed)+'" alt=""></div><div class="rcb"><div class="rcname">'+e(nm)+'</div><div class="rcrole">'+e(r.title||'')+'&nbsp;&middot;&nbsp;'+e(r.co||'')+'</div><div class="rcmeta">'+e(r.session||'')+'</div></div><div class="rca"><button class="rcbtn" data-follow="'+e(nm)+'">Follow</button></div></div>';
+}
+function cardHTML(item){if(item.t==='person')return personCard(item);if(item.t==='session')return sessionCard(item);if(item.t==='speaker')return speakerCard(item);return '';}
+
+function renderChat() {
+  var out='';
+  out+='<div class="bgreet">'+bav()+'<div class="gbub">'+e(GREET)+'</div></div>';
+  if (!S.thread.length&&!S.typing) {
+    out+='<div class="prow">'+SUGG.map(function(s){return '<button class="pchip" data-prompt="'+e(s)+'"><span class="picon">'+SPARK+'</span>'+e(s)+'</button>';}).join('')+'</div>';
+  }
+  for (var i=0;i<S.thread.length;i++) {
+    var m=S.thread[i];
+    if (m.role==='user') {
+      out+='<div class="msgs"><div class="bub-u">'+e(m.text)+'</div></div>';
+    } else {
+      var inn='';
+      if (m.isError) inn+='<div class="bub-brow">'+bav()+'<div class="bub-err">'+e(m.text)+'</div></div>';
+      else if (m.text) inn+='<div class="bub-brow">'+bav()+'<div class="bub-b">'+e(m.text)+'</div></div>';
+      if (m.cards&&m.cards.length) inn+='<div class="cwrap">'+m.cards.map(cardHTML).join('')+'</div>';
+      if (m.isConfirm) inn+='<div class="cwrap"><div class="cfw"><div class="cfp">'+(m.confirmMsg||'Confirm?')+'</div><div class="cfbtns"><button class="cfbtn p" data-cy="'+e(m.confirmYes||'')+'">Confirm</button><button class="cfbtn" data-cn2>Cancel</button></div></div></div>';
+      if (m.chips&&m.chips.length) inn+='<div class="chips">'+m.chips.map(function(c){return '<button class="chip" data-prompt="'+e(c)+'">'+e(c)+'</button>';}).join('')+'</div>';
+      out+=inn;
+    }
+  }
+  if (S.typing) out+='<div class="tyrow">'+bav()+'<div class="tybub"><span></span><span></span><span></span></div></div>';
+  g('chat').innerHTML=out;
+  bindChat(g('chat'));
+  requestAnimationFrame(function(){var cs=g('cs');cs.scrollTop=cs.scrollHeight;});
+}
+
+function bindChat(scope) {
+  scope.querySelectorAll('[data-prompt]').forEach(function(b){b.addEventListener('click',function(){ask(b.getAttribute('data-prompt'));});});
+  scope.querySelectorAll('[data-ct]').forEach(function(card){
+    card.addEventListener('click',function(ev){
+      if (ev.target.closest('[data-meet],[data-follow],[data-ag]')) return;
+      var ct=card.getAttribute('data-ct');
+      if (ct==='person'||ct==='speaker') openPeek(ct,card.getAttribute('data-cn'));
+      else if (ct==='session') openPeekS(card.getAttribute('data-stitle'));
+    });
+  });
+  scope.querySelectorAll('[data-meet]').forEach(function(b){b.addEventListener('click',function(ev){ev.stopPropagation();ask('Request a meeting with '+b.getAttribute('data-meet'));});});
+  scope.querySelectorAll('[data-follow]').forEach(function(b){b.addEventListener('click',function(ev){ev.stopPropagation();ask('Follow '+b.getAttribute('data-follow'));});});
+  scope.querySelectorAll('[data-ag]').forEach(function(b){b.addEventListener('click',function(ev){ev.stopPropagation();var tl=b.getAttribute('data-ag'),ia=b.getAttribute('data-ia')==='1';ask((ia?'Remove ':'Add ')+tl+(ia?' from':' to')+' my agenda');});});
+  scope.querySelectorAll('[data-cy]').forEach(function(b){b.addEventListener('click',function(){S.thread.push({role:'bizzy',text:'Done! '+(b.getAttribute('data-cy')||'Confirmed.'),chips:["What's next?","Thanks"]});renderChat();});});
+  scope.querySelectorAll('[data-cn2]').forEach(function(b){b.addEventListener('click',function(){S.thread.push({role:'bizzy',text:'No problem - nothing was changed. Anything else?',chips:SUGG.slice(0,2)});renderChat();});});
+}
+
+// ── Scripted response engine (fully offline, no API key needed) ──
+
+var RESPONSES = [
+
+  // ── Anchor card CTA ──
+  { match: ['how do i get to hall b','navigate','directions to hall b','hall b directions','get to hall b'],
+    resp: {kind:'chat', text:'Hall B is on Level 2 — take the main escalators from the central atrium, turn right at the top. Should take about 3 minutes from registration. AI in Product Design starts at 14:30, so you have time.', chips:['Add to agenda','Who is speaking?','What is on now?']} },
+
+  // ── Shortcut: Today\'s sessions ──
+  { match: ['what sessions are on today','sessions today','full lineup','all sessions','what is on today'],
+    resp: {kind:'cards', text:'Here is the full lineup for today:', cards:[{t:'session',title:'Building Sustainable Cities'},{t:'session',title:'AI in Product Design'},{t:'session',title:'Networking Mixer'},{t:'session',title:'Closing Keynote'}], chips:['Add all to agenda','What is on now?','Sessions on AI?']} },
+
+  // ── Shortcut: People to meet ──
+  { match: ['who should i meet today','people to meet','who should i meet','suggest people','recommend people','who to meet'],
+    resp: {kind:'cards', text:'Based on your interests in AI and design - these people are worth connecting with:', cards:[{t:'person',name:'Alex Chen'},{t:'person',name:'Priya Shah'},{t:'person',name:'Dana Goldberg'},{t:'person',name:'Tom Reyes'}], chips:['Request a meeting with Alex Chen','Who is free right now?','Designers only']} },
+
+  // ── Shortcut: My meetings ──
+  { match: ['show my meetings today','my meetings','meetings today','my scheduled meetings'],
+    resp: {kind:'cards', text:'You have 2 meetings scheduled today:', cards:[{t:'person',name:'Alex Chen',avail:'15:30 - Networking Floor'},{t:'person',name:'Priya Shah',avail:'16:00 - Networking Floor'}], chips:['Reschedule with Alex','Send a message to Priya','Request another meeting']} },
+
+  // ── Shortcut: My agenda ──
+  { match: ['show my agenda','my agenda','what is on my agenda','saved sessions','what have i saved'],
+    resp: {kind:'cards', text:"Here is what you have saved:", cards:[{t:'session',title:'AI in Product Design'}], chips:['What else should I add?','Sessions I might like','Clear my agenda']} },
+
+  // ── Follow-up chips from sessions list ──
+  { match: ['add all to agenda'],
+    resp: {kind:'confirm', text:"Here is what I will do:", confirmMsg:'All 4 sessions will be added to your agenda — Building Sustainable Cities, AI in Product Design, Networking Mixer, and Closing Keynote.', confirmYes:'All 4 sessions added to your agenda'} },
+  { match: ['what is on now?','what is on now','what is happening now','what is happening right now','what is on right now'],
+    resp: {kind:'cards', text:'Building Sustainable Cities is live right now in Auditorium A. Maya Levine is about 20 minutes in:', cards:[{t:'session',title:'Building Sustainable Cities'}], chips:['Add to agenda','Who is Maya Levine?','What is up next?']} },
+  { match: ['sessions on ai?','sessions on ai','ai sessions','talks about ai','ai talks'],
+    resp: {kind:'cards', text:'Two sessions today are directly relevant to your AI interests:', cards:[{t:'session',title:'AI in Product Design'},{t:'session',title:'Closing Keynote'}], chips:['Add AI in Product Design to agenda','Who is speaking at the keynote?','Who should I meet?']} },
+
+  // ── Follow-up chips from people list ──
+  { match: ['request a meeting with alex chen','meet alex','meeting with alex'],
+    resp: {kind:'confirm', text:'Here is what I will do:', confirmMsg:'Meeting request will be sent to Alex Chen for 15:30 on the Networking Floor. He will get a notification.', confirmYes:'Meeting request sent to Alex Chen for 15:30'} },
+  { match: ['who is free right now?','who is free right now','who is free','who is available now','free right now'],
+    resp: {kind:'cards', text:'Two people are free right now and match your interests:', cards:[{t:'person',name:'Tom Reyes'},{t:'person',name:'Dana Goldberg'}], chips:['Request a meeting with Tom Reyes','Request a meeting with Dana Goldberg','Show all people']} },
+  { match: ['designers only','only designers','show designers','find designers','design people'],
+    resp: {kind:'cards', text:'Two designers attending match your profile:', cards:[{t:'person',name:'Priya Shah'},{t:'person',name:'Dana Goldberg'}], chips:['Request a meeting with Priya Shah','Who else should I meet?','Sessions on design?']} },
+
+  // ── Follow-up chips from meetings ──
+  { match: ['reschedule with alex','reschedule alex','change alex meeting','move alex meeting'],
+    resp: {kind:'confirm', text:'Here is what I will do:', confirmMsg:'A reschedule request will be sent to Alex Chen. He will be able to propose a new time.', confirmYes:'Reschedule request sent to Alex Chen'} },
+  { match: ['send a message to priya','message priya','message to priya'],
+    resp: {kind:'confirm', text:'Here is what I will do:', confirmMsg:'Your message will be sent to Priya Shah. She will be notified.', confirmYes:'Message sent to Priya Shah'} },
+  { match: ['request another meeting','book another meeting','add another meeting'],
+    resp: {kind:'cards', text:'Here are a few people still with open slots today:', cards:[{t:'person',name:'Tom Reyes'},{t:'person',name:'Dana Goldberg'}], chips:['Request a meeting with Tom Reyes','Request a meeting with Dana Goldberg','Show all people']} },
+
+  // ── Follow-up chips from agenda ──
+  { match: ['what else should i add?','what else should i add','suggest sessions','what should i add','recommend sessions'],
+    resp: {kind:'cards', text:'Based on your interests, these are worth adding:', cards:[{t:'session',title:'Building Sustainable Cities'},{t:'session',title:'Closing Keynote'}], chips:['Add Building Sustainable Cities','Add Closing Keynote','Show full lineup']} },
+  { match: ['sessions i might like','sessions for me','recommended sessions','what would i like'],
+    resp: {kind:'cards', text:'These match your profile best — AI, design, and product:', cards:[{t:'session',title:'AI in Product Design'},{t:'session',title:'Closing Keynote'},{t:'session',title:'Building Sustainable Cities'}], chips:['Add all three','Show full lineup','Who is speaking?']} },
+  { match: ['clear my agenda','remove all','delete agenda','empty agenda'],
+    resp: {kind:'confirm', text:'Here is what I will do:', confirmMsg:'All sessions will be removed from your agenda. This cannot be undone.', confirmYes:'Agenda cleared'} },
+
+  // ── Directions / Wayfinding ──
+  { match: ['where is hall b','hall b location','how do i find hall b','get to hall b','directions hall b'],
+    resp: {kind:'chat', text:'Hall B is on Level 2 — take the main escalators from the central atrium and turn right at the top. Look for the blue signs. About 3 minutes from where you are.', chips:['Add AI in Product Design to agenda','What is on now?','WiFi password?']} },
+  { match: ['where is auditorium a','auditorium a location','how to get to auditorium','directions auditorium'],
+    resp: {kind:'chat', text:'Auditorium A is on Level 1, straight ahead from the main entrance. It is the largest room in the venue — hard to miss. Building Sustainable Cities is live there right now.', chips:['Add to agenda','What is on now?','WiFi password?']} },
+  { match: ['where is level 1','level 1 location','networking floor','where is the networking floor','where is the mixer'],
+    resp: {kind:'chat', text:'Level 1 is the ground floor — head down from registration or take any of the side stairways. The Networking Mixer is there from 16:00, open floor layout.', chips:['Who should I meet?','My meetings','What time is it?']} },
+  { match: ['where is main stage','main stage location','directions main stage','how to get to main stage'],
+    resp: {kind:'chat', text:'Main Stage is on Level 3, accessible by the central escalators or the east lifts. The Closing Keynote with Sarah Chen starts at 17:30 — worth getting there a few minutes early, it fills up fast.', chips:['Add Closing Keynote to agenda','Who is Sarah Chen?','What is on now?']} },
+  { match: ['where is registration','registration desk','where do i register','how to register'],
+    resp: {kind:'chat', text:'Registration is on Level 0 — ground floor, Lanes A and B. Wait time is currently about 5 minutes. WiFi is available while you queue: WebSummit2026.', chips:['WiFi password?','What is on first?','Build my schedule']} },
+
+  // ── WiFi / Logistics ──
+  { match: ['wifi','wifi password','wifi code','internet','connect to wifi','what is the wifi','websummit wifi'],
+    resp: {kind:'chat', text:'WiFi network: WebSummit2026 (no password, just select and connect). Works throughout the venue including all session rooms and the outdoor areas.', chips:['Where is Hall B?','What is on now?','My agenda']} },
+
+  // ── Sessions: add/remove ──
+  { match: ['add ai in product design','add ai in product design to agenda','save ai in product design'],
+    resp: {kind:'confirm', text:'Here is what I will do:', confirmMsg:'AI in Product Design (14:30, Hall B) will be added to your agenda.', confirmYes:'AI in Product Design added to your agenda'} },
+  { match: ['add building sustainable cities','add building sustainable cities to agenda','save building sustainable cities'],
+    resp: {kind:'confirm', text:'Here is what I will do:', confirmMsg:'Building Sustainable Cities (14:00, Auditorium A) will be added to your agenda.', confirmYes:'Building Sustainable Cities added to your agenda'} },
+  { match: ['add closing keynote','add closing keynote to agenda','save closing keynote'],
+    resp: {kind:'confirm', text:'Here is what I will do:', confirmMsg:'Closing Keynote (17:30, Main Stage) will be added to your agenda.', confirmYes:'Closing Keynote added to your agenda'} },
+  { match: ['add networking mixer','add networking mixer to agenda','save networking mixer'],
+    resp: {kind:'confirm', text:'Here is what I will do:', confirmMsg:'Networking Mixer (16:00, Level 1) will be added to your agenda.', confirmYes:'Networking Mixer added to your agenda'} },
+  { match: ['remove ai in product design from my agenda','remove ai in product design','unsave ai in product design'],
+    resp: {kind:'confirm', text:'Here is what I will do:', confirmMsg:'AI in Product Design will be removed from your agenda.', confirmYes:'AI in Product Design removed from your agenda'} },
+  { match: ['add all three','add all sessions','save all sessions','add all to my agenda'],
+    resp: {kind:'confirm', text:'Here is what I will do:', confirmMsg:'Building Sustainable Cities, AI in Product Design, and Closing Keynote will all be added to your agenda.', confirmYes:'3 sessions added to your agenda'} },
+
+  // ── Speaker lookups ──
+  { match: ['who is speaking?','who is speaking','who are the speakers','show speakers','speakers today'],
+    resp: {kind:'cards', text:"Today's speakers across your saved and suggested sessions:", cards:[{t:'speaker',name:'Daniel Wu'},{t:'speaker',name:'Maya Levine'},{t:'speaker',name:'Sarah Chen'}], chips:['Tell me more about Daniel Wu','Who is Sarah Chen?','AI in Product Design']} },
+  { match: ['who is daniel wu','tell me more about daniel wu','daniel wu','more about daniel wu'],
+    resp: {kind:'cards', text:'Daniel Wu leads AI design at Figma — speaking in 23 minutes:', cards:[{t:'speaker',name:'Daniel Wu'}], chips:['Add AI in Product Design to agenda','Where is Hall B?','Request a meeting with Daniel Wu']} },
+  { match: ['who is maya levine','tell me more about maya levine','maya levine','more about maya levine'],
+    resp: {kind:'cards', text:'Maya Levine is live on stage right now in Auditorium A:', cards:[{t:'speaker',name:'Maya Levine'}], chips:['Add Building Sustainable Cities to agenda','Where is Auditorium A?','Who else is speaking?']} },
+  { match: ['who is sarah chen','tell me more about sarah chen','sarah chen','more about sarah chen'],
+    resp: {kind:'cards', text:'Sarah Chen closes the day at 17:30 on Main Stage:', cards:[{t:'speaker',name:'Sarah Chen'}], chips:['Add Closing Keynote to agenda','Where is Main Stage?','Who else is speaking?']} },
+  { match: ['who is speaking at the keynote?','who is speaking at the keynote','keynote speaker','who speaks at keynote'],
+    resp: {kind:'cards', text:'The Closing Keynote at 17:30 is Sarah Chen, CEO of Threadwise:', cards:[{t:'speaker',name:'Sarah Chen'}], chips:['Add Closing Keynote to agenda','Where is Main Stage?','Tell me more about Sarah Chen']} },
+
+  // ── What is up next / what is on ──
+  { match: ['what is up next?','what is up next','what is next','next session','up next'],
+    resp: {kind:'cards', text:'AI in Product Design is your next session — starting in 23 min in Hall B:', cards:[{t:'session',title:'AI in Product Design'}], chips:['Where is Hall B?','Who is speaking?','Add to agenda']} },
+  { match: ['show full lineup','full schedule','all sessions today','show all sessions'],
+    resp: {kind:'cards', text:'Full schedule for today:', cards:[{t:'session',title:'Building Sustainable Cities'},{t:'session',title:'AI in Product Design'},{t:'session',title:'Networking Mixer'},{t:'session',title:'Closing Keynote'}], chips:['Add all to agenda','What is on now?','My agenda']} },
+  { match: ['build my schedule','build a schedule','plan my day','suggest a schedule','what should i do'],
+    resp: {kind:'cards', text:'Based on your interests, here is a solid plan for the rest of the day:', cards:[{t:'session',title:'AI in Product Design'},{t:'session',title:'Networking Mixer'},{t:'session',title:'Closing Keynote'}], chips:['Add all three','Who should I meet?','My agenda']} },
+
+  // ── Meeting requests for specific people ──
+  { match: ['request a meeting with priya','meet priya','meeting with priya','request meeting priya'],
+    resp: {kind:'confirm', text:'Here is what I will do:', confirmMsg:'Meeting request will be sent to Priya Shah for 16:00 on the Networking Floor. She will get a notification.', confirmYes:'Meeting request sent to Priya Shah for 16:00'} },
+  { match: ['request a meeting with dana','meet dana','meeting with dana','request meeting dana'],
+    resp: {kind:'confirm', text:'Here is what I will do:', confirmMsg:'Meeting request will be sent to Dana Goldberg. She is in Hall B now so she may respond after the session.', confirmYes:'Meeting request sent to Dana Goldberg'} },
+  { match: ['request a meeting with tom','meet tom','meeting with tom','request meeting tom','request a meeting with tom reyes'],
+    resp: {kind:'confirm', text:'Here is what I will do:', confirmMsg:'Meeting request will be sent to Tom Reyes for 14:45 in the Lobby. He is free right now.', confirmYes:'Meeting request sent to Tom Reyes for 14:45'} },
+  { match: ['request a meeting with daniel wu','meet daniel wu','meeting with daniel wu'],
+    resp: {kind:'confirm', text:'Here is what I will do:', confirmMsg:'A meeting request will be sent to Daniel Wu after his talk at 14:30. He typically does 15 minutes of informal Q&A at the side exit.', confirmYes:'Meeting request sent to Daniel Wu'} },
+  { match: ['follow daniel wu','follow maya levine','follow sarah chen','follow speaker'],
+    resp: {kind:'confirm', text:'Here is what I will do:', confirmMsg:'You will follow this speaker and receive a summary of their talk after the session ends.', confirmYes:'Speaker followed'} },
+  { match: ['send a connection request','connect with','connection request'],
+    resp: {kind:'confirm', text:'Here is what I will do:', confirmMsg:'A connection request will be sent. They will be notified and can accept from their app.', confirmYes:'Connection request sent'} },
+  { match: ['send a message to alex','message alex','message to alex'],
+    resp: {kind:'confirm', text:'Here is what I will do:', confirmMsg:'Your message will be sent to Alex Chen. He will be notified.', confirmYes:'Message sent to Alex Chen'} },
+
+  // ── What\'s next chips / post-confirm ──
+  { match: ["what's next?","what now","what else","what next"],
+    resp: {kind:'chat', text:'AI in Product Design starts in 23 min in Hall B — that is your next agenda item. After that, the Networking Mixer at 16:00 on Level 1 would be a good window to meet people.', chips:['Where is Hall B?','Who should I meet?','My agenda']} },
+  { match: ['thanks','thank you','cheers','great','perfect','awesome','nice','cool'],
+    resp: {kind:'chat', text:'Any time. I am here if you need anything else.', chips:['What is on now?','Who should I meet?','My agenda']} },
+  { match: ['try again'],
+    resp: {kind:'chat', text:'Of course. What would you like to know?', chips:['What is on now?','Who should I meet?','My agenda']} },
+  { match: ['ask something else','something else','other question','different question'],
+    resp: {kind:'chat', text:'Sure. What else can I help with?', chips:['What is on now?','Who should I meet?','Show full lineup']} },
+
+  // ── Small talk ──
+  { match: ['hello','hi','hey','hi bizzy','hello bizzy','hey bizzy'],
+    resp: {kind:'chat', text:'Hey Julia! Event is live and you have AI in Product Design coming up in 23 minutes. Anything I can help with?', chips:['What is on now?','Who should I meet?','Where is Hall B?']} },
+  { match: ['how are you','how are you doing','you okay','you good'],
+    resp: {kind:'chat', text:'Doing well and tracking everything so you do not have to. What do you need?', chips:['What is on now?','My agenda','Who should I meet?']} },
+  { match: ['who are you','what are you','what is bizzy','tell me about yourself','what can you do','what do you do'],
+    resp: {kind:'chat', text:'I am Bizzy, your event concierge for Web Summit. I can help you navigate sessions, find people to meet, manage your agenda, and answer anything about the venue or schedule. Just ask.', chips:['What is on now?','Who should I meet?','Show full lineup']} },
+  { match: ['i am hungry','hungry','where is food','food','lunch','eat','coffee','cafe','restaurant'],
+    resp: {kind:'chat', text:'Food stalls are on Level 1 near the east exit — quick bites and coffee. The catering area on Level 2 has sit-down options. Both usually quieter between sessions.', chips:['What is on now?','WiFi password?','My agenda']} },
+  { match: ['i am tired','tired','exhausted','need a break','need rest','rest area'],
+    resp: {kind:'chat', text:'There is a quiet lounge on Level 3 near the west stairs — good for a 10-minute recharge. The Networking Mixer at 16:00 is a lighter format if you need a break from sessions.', chips:['What is on now?','My meetings','My agenda']} },
+  { match: ['i am lost','lost','confused','where am i','help me find','i cannot find'],
+    resp: {kind:'chat', text:'No problem. Where are you trying to get to? I can give you step-by-step directions from any part of the venue.', chips:['Where is Hall B?','Where is Auditorium A?','Where is registration?']} },
+  { match: ['what time is it','current time','time now'],
+    resp: {kind:'chat', text:'It is 14:07. Building Sustainable Cities is live right now in Auditorium A, and AI in Product Design starts in Hall B at 14:30.', chips:['What is up next?','Where is Hall B?','My agenda']} }
+];
+
+function scriptedResponse(query) {
+  var q = query.toLowerCase().trim().replace(/[?!.,]/g,'');
+  for (var i = 0; i < RESPONSES.length; i++) {
+    var entry = RESPONSES[i];
+    for (var j = 0; j < entry.match.length; j++) {
+      var pattern = entry.match[j].toLowerCase().replace(/[?!.,]/g,'');
+      if (q === pattern || q.indexOf(pattern) !== -1 || pattern.indexOf(q) !== -1) {
+        return entry.resp;
+      }
+    }
+  }
+  // Keyword fallback
+  if (q.indexOf('session') !== -1 || q.indexOf('talk') !== -1 || q.indexOf('schedule') !== -1) {
+    return {kind:'cards', text:'Here is what is on today:', cards:[{t:'session',title:'Building Sustainable Cities'},{t:'session',title:'AI in Product Design'},{t:'session',title:'Networking Mixer'},{t:'session',title:'Closing Keynote'}], chips:['What is on now?','My agenda','Who should I meet?']};
+  }
+  if (q.indexOf('meet') !== -1 || q.indexOf('people') !== -1 || q.indexOf('network') !== -1 || q.indexOf('connect') !== -1) {
+    return {kind:'cards', text:'Here are the best people to connect with today:', cards:[{t:'person',name:'Alex Chen'},{t:'person',name:'Priya Shah'},{t:'person',name:'Dana Goldberg'},{t:'person',name:'Tom Reyes'}], chips:['Request a meeting with Alex Chen','Who is free right now?','Designers only']};
+  }
+  if (q.indexOf('speaker') !== -1 || q.indexOf('daniel') !== -1 || q.indexOf('maya') !== -1 || q.indexOf('sarah') !== -1) {
+    return {kind:'cards', text:"Today's speakers:", cards:[{t:'speaker',name:'Daniel Wu'},{t:'speaker',name:'Maya Levine'},{t:'speaker',name:'Sarah Chen'}], chips:['Add AI in Product Design to agenda','Where is Hall B?','Who should I meet?']};
+  }
+  if (q.indexOf('direction') !== -1 || q.indexOf('where') !== -1 || q.indexOf('find') !== -1 || q.indexOf('get to') !== -1) {
+    return {kind:'chat', text:'Where are you trying to get to? Hall B, Auditorium A, Main Stage, Level 1, or registration?', chips:['Where is Hall B?','Where is Auditorium A?','Where is registration?']};
+  }
+  if (q.indexOf('agenda') !== -1 || q.indexOf('saved') !== -1 || q.indexOf('my session') !== -1) {
+    return {kind:'cards', text:"Here is what you have saved:", cards:[{t:'session',title:'AI in Product Design'}], chips:['What else should I add?','Sessions I might like','Show full lineup']};
+  }
+  if (q.indexOf('wifi') !== -1 || q.indexOf('internet') !== -1 || q.indexOf('password') !== -1) {
+    return {kind:'chat', text:'WiFi: WebSummit2026 — no password, available throughout the venue.', chips:['Where is Hall B?','What is on now?','My agenda']};
+  }
+  // Generic fallback
+  return {kind:'chat', text:"Good question. Here is what I can help with right now: finding sessions, navigating the venue, connecting with people, or managing your agenda. What do you need?", chips:['What is on now?','Who should I meet?','Where is Hall B?']};
+}
+
+function ask(query){
+  if(!query||S.typing)return;
+  S.thread.push({role:'user',text:query}); S.typing=true; renderChat();
+  setTimeout(function(){
+    S.typing=false;
+    var resp=scriptedResponse(query);
+    if(resp.kind==='cards') S.thread.push({role:'bizzy',text:resp.text,cards:resp.cards,chips:resp.chips});
+    else if(resp.kind==='confirm') S.thread.push({role:'bizzy',text:resp.text,isConfirm:true,confirmMsg:resp.confirmMsg,confirmYes:resp.confirmYes});
+    else S.thread.push({role:'bizzy',text:resp.text,chips:resp.chips||[]});
+    renderChat();
+  }, 700);
+}
+
+function closePeek(){g('pscrim').classList.remove('open');g('psheet').classList.remove('open');}
+
+function openPeek(type,name){
+  var r=type==='person'?(PP[name]||{}):(SP[name]||{});
+  var seed=r.seed!=null?r.seed:0,topics=r.topics||[];
+  g('phead').innerHTML='<div class="pph"><img src="'+av(seed)+'" alt=""></div><div class="pinfo"><div class="pname">'+e(name)+'</div><div class="psub">'+e(r.role||r.title||'')+'&nbsp;&middot;&nbsp;'+e(r.co||'')+'</div><div class="ptags">'+topics.map(function(t){return '<span class="ptag">'+e(t)+'</span>';}).join('')+'</div></div>';
+  var bh='<div>';
+  if(r.bio)bh+='<div class="pr"><div class="pri"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M5 21v-2a7 7 0 0 1 14 0v2"/></svg></div><div><div class="prl">About</div><div class="prv" style="font-size:12px;font-weight:500;line-height:1.5">'+e(r.bio)+'</div></div></div>';
+  if(type==='person'){
+    bh+='<div class="pr"><div class="pri"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div><div class="prl">Availability</div><div class="prv">'+e(r.avail||'Attending')+'</div></div></div>';
+    if((r.slots||[]).length)bh+='<div class="pr"><div class="pri"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div><div class="prl">Open slots</div><div class="prv">'+r.slots.map(function(s){return '<div>'+e(s)+'</div>';}).join('')+'</div></div></div>';
+    if(r.score)bh+='<div class="pr"><div class="pri" style="color:var(--accent)"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L13.5 8.5L20 10L13.5 11.5L12 18L10.5 11.5L4 10L10.5 8.5Z"/></svg></div><div><div class="prl">Match score</div><div class="prv" style="color:var(--accent)">'+r.score+'% match</div><div class="prh">'+topics.length+' shared interests</div></div></div>';
+  } else {
+    if(r.session)bh+='<div class="pr"><div class="pri"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div><div><div class="prl">Speaking at</div><div class="prv">'+e(r.session)+'</div><div class="prh">'+e(r.stime||'')+'</div></div></div>';
+    if(r.talk)bh+='<div class="pr"><div class="pri"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div><div class="prl">Talk preview</div><div class="prv" style="font-size:12px;font-weight:500;line-height:1.5">'+e(r.talk)+'</div></div></div>';
+  }
+  bh+='</div>';
+  g('pbody').innerHTML=bh;
+  g('pq').textContent=type==='person'?'Want to see the full profile or request a meeting?':'Want to see the full speaker profile?';
+  if(type==='person'){
+    g('pact').innerHTML='<button class="pbtn pbtn-s" id="pa-full">Full profile</button><button class="pbtn pbtn-p" id="pa-meet">Request meeting</button>';
+    g('pa-full').addEventListener('click',function(){closePeek();openDetail('person',name);});
+    g('pa-meet').addEventListener('click',function(){closePeek();ask('Request a meeting with '+name);});
+  } else {
+    g('pact').innerHTML='<button class="pbtn pbtn-s" id="pa-ask">Ask Bizzy</button><button class="pbtn pbtn-p" id="pa-full">Full profile</button>';
+    g('pa-ask').addEventListener('click',function(){closePeek();ask('Tell me more about '+name);});
+    g('pa-full').addEventListener('click',function(){closePeek();openDetail('speaker',name);});
+  }
+  g('pscrim').classList.add('open');g('psheet').classList.add('open');
+}
+
+function openPeekS(title){
+  var r=SS[title]||{},inAg=r.inAgenda||false,tag=r.tag||null;
+  var tagh=tag==='live'?'<div style="margin-bottom:4px"><span style="display:inline-flex;align-items:center;gap:5px;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:rgba(220,38,38,.10);color:#B91C1C;padding:3px 8px;border-radius:999px"><span class="rdot"></span>Live now</span></div>':tag==='next'?'<div style="margin-bottom:4px"><span style="font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:rgba(243,12,95,.10);color:var(--accent);padding:3px 8px;border-radius:999px">Up next</span></div>':'';
+  g('phead').innerHTML='<div class="pphsq"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div><div class="pinfo">'+tagh+'<div class="pname" style="font-size:16px">'+e(title)+'</div><div class="psub">'+e(r.time||'')+'&nbsp;&middot;&nbsp;'+e(r.room||'')+(r.spk?'&nbsp;&middot;&nbsp;'+e(r.spk):'')+'</div></div>';
+  var bh='<div>';
+  if(r.desc)bh+='<div class="pr"><div class="pri"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg></div><div><div class="prl">About this talk</div><div class="prv" style="font-size:12px;font-weight:500;line-height:1.5">'+e(r.desc)+'</div></div></div>';
+  bh+='<div class="pr"><div class="pri"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div><div class="prl">Time &amp; duration</div><div class="prv">'+e(r.time||'')+'&nbsp;&middot;&nbsp;'+e(r.dur||'45 min')+'</div></div></div>';
+  if(r.att)bh+='<div class="pr"><div class="pri"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div><div class="prl">Attendance</div><div class="prv">'+r.att+' / '+r.cap+'&nbsp;&middot;&nbsp;<span style="color:var(--t3);font-weight:500;font-size:11px">'+Math.round(r.att/r.cap*100)+'% full</span></div></div></div>';
+  if(r.why)bh+='<div class="pr"><div class="pri" style="color:var(--accent)"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L13.5 8.5L20 10L13.5 11.5L12 18L10.5 11.5L4 10L10.5 8.5Z"/></svg></div><div><div class="prl">Why Bizzy suggests this</div><div class="prv" style="color:var(--accent)">'+e(r.why)+'</div></div></div>';
+  bh+='</div>';
+  g('pbody').innerHTML=bh;
+  g('pq').textContent='Want to open the full session page?';
+  g('pact').innerHTML='<button class="pbtn pbtn-s" id="pa-ag">'+(inAg?'Remove from agenda':'+ Add to agenda')+'</button><button class="pbtn pbtn-p" id="pa-full">Full session page</button>';
+  g('pa-ag').addEventListener('click',function(){closePeek();ask((inAg?'Remove ':'Add ')+title+(inAg?' from':' to')+' my agenda');});
+  g('pa-full').addEventListener('click',function(){closePeek();openDetail('session',title);});
+  g('pscrim').classList.add('open');g('psheet').classList.add('open');
+}
+
+function closeDetail(){g('dpage').classList.remove('open');}
+function cdAsk(q){closeDetail();ask(q);}
+
+function openDetail(type,key){
+  var dscroll=g('dscroll'),dntitle=g('dntitle'),dnact=g('dnact');
+  var newAct=dnact.cloneNode(true); dnact.parentNode.replaceChild(newAct,dnact); var na=g('dnact');
+  if(type==='person'){
+    var r=PP[key]||{},seed=r.seed!=null?r.seed:0,topics=r.topics||[];
+    dntitle.textContent='Attendee profile'; na.textContent='Connect';
+    na.addEventListener('click',function(){cdAsk('Send a connection request to '+key);});
+    dscroll.innerHTML='<div class="dbanner"><div class="dbbg" style="background:linear-gradient(135deg,#1A1915,#2D1A4A)"></div><div style="position:absolute;bottom:0;left:0;right:0;padding:0 18px 16px;display:flex;align-items:flex-end;gap:14px"><div style="width:68px;height:68px;border-radius:50%;overflow:hidden;border:3px solid rgba(255,255,255,.2);flex-shrink:0"><img src="'+av(seed)+'" style="width:100%;height:100%;object-fit:cover"></div><div><div style="font-size:20px;font-weight:800;color:#FFF;letter-spacing:-.5px">'+e(key)+'</div><div style="font-size:13px;font-weight:500;color:rgba(255,255,255,.65);margin-top:3px">'+e(r.role||'')+'&nbsp;&middot;&nbsp;'+e(r.co||'')+'</div></div></div></div>'
+      +'<div style="padding:16px 18px 0"><div class="dstats"><div class="dstat"><div class="dsv">'+(r.score?r.score+'%':'--')+'</div><div class="dsl">Match</div></div><div class="dstat"><div class="dsv">'+((r.sessions||[]).length||'--')+'</div><div class="dsl">Sessions</div></div><div class="dstat"><div class="dsv">'+((r.slots||[]).length||'--')+'</div><div class="dsl">Slots</div></div></div></div>'
+      +(r.bio?'<div class="dsec"><div class="dstitle">About</div><div class="dcard" style="font-size:13px;font-weight:500;line-height:1.6;color:var(--t2)">'+e(r.bio)+'</div></div>':'')
+      +(topics.length?'<div class="dsec"><div class="dstitle">Shared interests</div><div class="dcard"><div style="display:flex;flex-wrap:wrap;gap:6px">'+topics.map(function(t){return '<span style="background:var(--accent-soft);color:var(--accent);font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px">'+e(t)+'</span>';}).join('')+'</div></div></div>':'')
+      +((r.slots||[]).length?'<div class="dsec"><div class="dstitle">Available meeting slots</div><div class="dcard">'+r.slots.map(function(s){return '<div class="dr"><div class="dri"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div><div class="drv">'+e(s)+'</div></div></div>';}).join('')+'</div></div>':'')
+      +'<div style="height:90px"></div><div class="dcta"><button class="pbtn pbtn-p" style="flex:2" id="d-meet">Request meeting</button><button class="pbtn pbtn-s" style="flex:1" id="d-msg">Message</button></div>';
+    g('d-meet').addEventListener('click',function(){cdAsk('Request a meeting with '+key);});
+    g('d-msg').addEventListener('click',function(){cdAsk('Send a message to '+key);});
+  } else if(type==='speaker'){
+    var rs=SP[key]||{},sseed=rs.seed!=null?rs.seed:0;
+    var fk=(rs.followers||0)>1000?Math.round((rs.followers||0)/1000)+'k':(rs.followers||0);
+    dntitle.textContent='Speaker profile'; na.textContent='Follow';
+    na.addEventListener('click',function(){cdAsk('Follow '+key);});
+    dscroll.innerHTML='<div class="dbanner"><div class="dbbg" style="background:linear-gradient(135deg,#1A1915,#0B2D80)"></div><div style="position:absolute;bottom:0;left:0;right:0;padding:0 18px 16px;display:flex;align-items:flex-end;gap:14px"><div style="width:68px;height:68px;border-radius:50%;overflow:hidden;border:3px solid rgba(255,255,255,.2);flex-shrink:0"><img src="'+av(sseed)+'" style="width:100%;height:100%;object-fit:cover"></div><div><div style="font-size:20px;font-weight:800;color:#FFF;letter-spacing:-.5px">'+e(key)+'</div><div style="font-size:13px;font-weight:500;color:rgba(255,255,255,.65);margin-top:3px">'+e(rs.title||'')+' at '+e(rs.co||'')+'</div>'+(rs.tw?'<div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:3px">'+e(rs.tw)+'</div>':'')+'</div></div></div>'
+      +'<div style="padding:16px 18px 0"><div class="dstats"><div class="dstat"><div class="dsv">'+fk+'</div><div class="dsl">Followers</div></div><div class="dstat"><div class="dsv">'+(rs.talks||'--')+'</div><div class="dsl">Talks</div></div></div></div>'
+      +(rs.bio?'<div class="dsec"><div class="dstitle">About</div><div class="dcard" style="font-size:13px;font-weight:500;line-height:1.6;color:var(--t2)">'+e(rs.bio)+'</div></div>':'')
+      +(rs.session?'<div class="dsec"><div class="dstitle">Speaking at Web Summit</div><div class="dcard spkchip" id="d-sess"><div style="width:36px;height:36px;border-radius:9px;background:var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div><div><div class="spkchip-name">'+e(rs.session)+'</div><div class="spkchip-role">'+e(rs.stime||'')+'&nbsp;&middot;&nbsp;Tap to view</div></div></div></div>':'')
+      +(rs.talk?'<div class="dsec"><div class="dstitle">Talk preview</div><div class="dcard" style="font-size:13px;font-weight:500;line-height:1.6;color:var(--t2)">'+e(rs.talk)+'</div></div>':'')
+      +'<div style="height:90px"></div><div class="dcta"><button class="pbtn pbtn-a" style="flex:2" id="d-fol">Follow speaker</button><button class="pbtn pbtn-s" style="flex:1" id="d-adds">Add session</button></div>';
+    if(g('d-sess')&&rs.session){(function(sn){g('d-sess').addEventListener('click',function(){closeDetail();openDetail('session',sn);});})(rs.session);}
+    g('d-fol').addEventListener('click',function(){cdAsk('Follow '+key);});
+    g('d-adds').addEventListener('click',function(){cdAsk('Add '+(rs.session||'')+' to my agenda');});
+  } else if(type==='session'){
+    var rse=SS[key]||{},inAg=rse.inAgenda||false;
+    var tgrads={'Design & Product':'135deg,#E8F3FF,#C8DCFF','Climate & Society':'135deg,#E8F5EC,#C8E8D0','Networking':'135deg,#FFF0E8,#FFD8C0','Keynote':'135deg,#1A1915,#333'};
+    var grad=tgrads[rse.track]||'135deg,#F3EEFF,#E8D8FF',isK=rse.track==='Keynote';
+    var tagh2='';
+    if(rse.tag==='live') tagh2='<div style="margin-bottom:8px"><span style="display:inline-flex;align-items:center;gap:5px;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:rgba(220,38,38,.10);color:#B91C1C;padding:4px 10px;border-radius:999px"><span class="rdot"></span>Live now</span></div>';
+    else if(rse.tag==='next') tagh2='<div style="margin-bottom:8px"><span style="font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:rgba(243,12,95,.10);color:var(--accent);padding:4px 10px;border-radius:999px">Up next</span></div>';
+    dntitle.textContent=rse.track||'Session'; na.textContent=inAg?'Saved':'+ Add'; na.style.color=inAg?'var(--t3)':'var(--accent)';
+    na.addEventListener('click',function(){cdAsk((inAg?'Remove ':'Add ')+key+(inAg?' from':' to')+' my agenda');});
+    var spkSeed=rse.spkSeed!=null?rse.spkSeed:0;
+    dscroll.innerHTML='<div class="dbanner"><div class="dbbg" style="background:linear-gradient('+grad+')"></div><div style="position:absolute;bottom:0;left:0;right:0;padding:0 18px 16px">'+tagh2+'<div style="font-size:22px;font-weight:800;letter-spacing:-.6px;line-height:1.15;color:'+(isK?'#FFF':'var(--t1)')+'">'+e(key)+'</div><div style="font-size:12.5px;font-weight:500;color:'+(isK?'rgba(255,255,255,.65)':'var(--t2)')+';margin-top:5px">'+e(rse.time||'')+'&nbsp;&middot;&nbsp;'+e(rse.room||'')+'&nbsp;&middot;&nbsp;'+e(rse.dur||'45 min')+'</div></div></div>'
+      +'<div style="padding:16px 18px 0"><div class="dstats"><div class="dstat"><div class="dsv">'+(rse.att||'--')+'</div><div class="dsl">Going</div></div><div class="dstat"><div class="dsv">'+(rse.cap||'--')+'</div><div class="dsl">Capacity</div></div>'+(rse.att&&rse.cap?'<div class="dstat" style="background:var(--accent-soft)"><div class="dsv" style="color:var(--accent)">'+Math.round(rse.att/rse.cap*100)+'%</div><div class="dsl" style="color:var(--accent)">Full</div></div>':'')+'</div></div>'
+      +(rse.desc?'<div class="dsec"><div class="dstitle">About this session</div><div class="dcard" style="font-size:13px;font-weight:500;line-height:1.6;color:var(--t2)">'+e(rse.desc)+'</div></div>':'')
+      +((rse.learn||[]).length?'<div class="dsec"><div class="dstitle">What you will learn</div><div class="dcard">'+rse.learn.map(function(l){return '<div class="dr"><div class="dri" style="color:var(--accent);background:var(--accent-soft)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div><div class="drv" style="font-weight:500">'+e(l)+'</div></div></div>';}).join('')+'</div></div>':'')
+      +(rse.why?'<div class="dsec"><div class="dstitle">Bizzy says</div><div class="dcard" style="display:flex;gap:10px;align-items:flex-start"><div style="width:32px;height:32px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="13" height="13" viewBox="0 0 24 24" fill="white"><path d="M12 2L13.5 8.5L20 10L13.5 11.5L12 18L10.5 11.5L4 10L10.5 8.5Z"/></svg></div><div style="font-size:13px;font-weight:500;line-height:1.55;color:var(--t2)">'+e(rse.why)+'</div></div></div>':'')
+      +(rse.spk?'<div class="dsec"><div class="dstitle">Speaker</div><div class="dcard spkchip" id="d-spk"><img src="'+av(spkSeed)+'" alt=""><div><div class="spkchip-name">'+e(rse.spk)+'</div><div class="spkchip-role">Tap to view full profile</div></div></div></div>':'')
+      +'<div style="height:90px"></div><div class="dcta"><button class="pbtn '+(inAg?'pbtn-s':'pbtn-a')+'" style="flex:2" id="d-ag">'+(inAg?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> In your agenda':'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add to agenda')+'</button><button class="pbtn pbtn-s" style="flex:1" id="d-dir">Directions</button></div>';
+    g('d-ag').addEventListener('click',function(){cdAsk((inAg?'Remove ':'Add ')+key+(inAg?' from':' to')+' my agenda');});
+    g('d-dir').addEventListener('click',function(){cdAsk('How do I get to '+(rse.room||'the venue')+'?');});
+    if(g('d-spk')&&rse.spk){(function(sn){g('d-spk').addEventListener('click',function(){closeDetail();openDetail('speaker',sn);});})(rse.spk);}
+  }
+  g('dpage').classList.add('open'); dscroll.scrollTop=0;
+}
+
+// ── Focus/blur: push content up when keyboard opens ──
+var inp=g('inp');
+inp.addEventListener('focus',function(){
+  setTimeout(function(){g('cs').scrollTop=g('cs').scrollHeight;},300);
+});
+
+g('dback').addEventListener('click',closeDetail);
+g('pscrim').addEventListener('click',closePeek);
+g('rbtn').addEventListener('click',function(){S.thread=[];S.asc=null;renderSC();renderChat();});
+g('sbtn').addEventListener('click',function(){var v=inp.value.trim();if(!v)return;inp.value='';ask(v);});
+inp.addEventListener('keydown',function(ev){if(ev.key==='Enter'){var v=inp.value.trim();if(!v)return;inp.value='';ask(v);}});
+
+renderAnchor(); renderSC(); renderChat();
+}());
+</script>
+</body>
+</html>
