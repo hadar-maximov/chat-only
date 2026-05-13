@@ -299,14 +299,27 @@ function e(s) { return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'
 var S = { lc:'live', thread:[], typing:false, asc:null };
 
 var _avs = {};
-function av(seed) {
-  if (_avs[seed]) return _avs[seed];
-  var pal=[['#F8E4CC','#B8641E','#1A1915',false],['#EDCFA0','#0E0A06','#1A4D8F',false],['#D4956A','#2C1810','#D97706',true],['#F5D5B0','#6B3A1F','#374151',false],['#C8956C','#1A1915','#16A34A',true],['#F0C8A0','#8B4513','#7C3AED',false],['#E8B88C','#4A2810','#DC2626',true],['#DCA878','#1A1915','#0891B2',false]];
-  var p=pal[seed%pal.length],sk=p[0],hr=p[1],sh=p[2],wy=p[3];
-  var hsvg=wy?'<path d="M35 44 Q48 28 60 34 Q72 28 85 44 Q90 56 85 68 Q72 46 60 44 Q48 46 35 68 Q30 56 35 44Z" fill="'+hr+'"/>':'<ellipse cx="60" cy="38" rx="26" ry="22" fill="'+hr+'"/><rect x="34" y="44" width="52" height="10" fill="'+hr+'"/>';
-  var svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120"><defs><clipPath id="cp'+seed+'"><circle cx="60" cy="60" r="60"/></clipPath></defs><g clip-path="url(#cp'+seed+')"><rect width="120" height="120" fill="#F0EDE6"/><ellipse cx="60" cy="130" rx="50" ry="34" fill="'+sh+'"/><rect x="53" y="76" width="14" height="20" rx="5" fill="'+sk+'"/><ellipse cx="35" cy="60" rx="5" ry="7" fill="'+sk+'"/><ellipse cx="85" cy="60" rx="5" ry="7" fill="'+sk+'"/>'+hsvg+'<ellipse cx="60" cy="57" rx="22" ry="24" fill="'+sk+'"/><path d="M48 47 Q52 45 56 47" stroke="'+hr+'" stroke-width="2" fill="none" stroke-linecap="round" opacity=".85"/><path d="M64 47 Q68 45 72 47" stroke="'+hr+'" stroke-width="2" fill="none" stroke-linecap="round" opacity=".85"/><ellipse cx="52" cy="54" rx="5" ry="4" fill="white"/><ellipse cx="68" cy="54" rx="5" ry="4" fill="white"/><circle cx="52" cy="54" r="3" fill="#3D2B1F"/><circle cx="68" cy="54" r="3" fill="#3D2B1F"/><circle cx="52" cy="54" r="1.6" fill="#111"/><circle cx="68" cy="54" r="1.6" fill="#111"/><circle cx="53.2" cy="52.8" r="1.1" fill="white" opacity=".9"/><circle cx="69.2" cy="52.8" r="1.1" fill="white" opacity=".9"/><path d="M54 71 Q60 75 66 71" stroke="#A0605A" stroke-width="1.8" fill="none" stroke-linecap="round"/></g></svg>';
-  _avs[seed]='data:image/svg+xml;base64,'+btoa(svg);
-  return _avs[seed];
+var AV_COLORS = [
+  ['#E8F0FF','#3B5BDB'],['#FFF0F6','#C2255C'],['#F0FFF4','#2F9E44'],
+  ['#FFF9DB','#E67700'],['#F3F0FF','#7048E8'],['#E6FCF5','#0CA678'],
+  ['#FFF4E6','#D9480F'],['#E7F5FF','#1971C2']
+];
+function av(name) {
+  if (_avs[name]) return _avs[name];
+  var parts = String(name).trim().split(' ');
+  var initials = parts.length >= 2
+    ? (parts[0][0] + parts[parts.length-1][0]).toUpperCase()
+    : String(name).slice(0,2).toUpperCase();
+  var ci = 0;
+  for (var i=0; i<name.length; i++) ci += name.charCodeAt(i);
+  var col = AV_COLORS[ci % AV_COLORS.length];
+  var bg = col[0], fg = col[1];
+  var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">'
+    + '<circle cx="60" cy="60" r="60" fill="' + bg + '"/>'
+    + '<text x="60" y="60" dy=".36em" text-anchor="middle" font-family="Manrope,system-ui,sans-serif" font-size="44" font-weight="700" fill="' + fg + '" letter-spacing="-1">' + initials + '</text>'
+    + '</svg>';
+  _avs[name] = 'data:image/svg+xml;base64,' + btoa(svg);
+  return _avs[name];
 }
 
 var PP={
@@ -369,8 +382,8 @@ function renderSC() {
 }
 
 function personCard(item) {
-  var nm=item.name,r=PP[nm]||{},seed=r.seed!=null?r.seed:0,avail=item.avail||r.avail||'Attending',topics=(r.topics||[]).slice(0,3);
-  return '<div class="rc" data-ct="person" data-cn="'+e(nm)+'"><div class="rcph"><img src="'+av(seed)+'" alt=""></div><div class="rcb"><div class="rcname">'+e(nm)+'</div><div class="rcrole">'+e(r.role||'')+'&nbsp;&middot;&nbsp;'+e(r.co||'')+'</div><div class="rcmeta">'+e(avail)+'</div>'+(topics.length?'<div class="rcmuts">'+topics.map(function(t){return '<span class="rcmut">'+e(t)+'</span>';}).join('')+'</div>':'')+'</div><div class="rca"><button class="rcbtn rcbtn-p" data-meet="'+e(nm)+'">Meet</button></div></div>';
+  var nm=item.name,r=PP[nm]||{},avail=item.avail||r.avail||'Attending',topics=(r.topics||[]).slice(0,3);
+  return '<div class="rc" data-ct="person" data-cn="'+e(nm)+'"><div class="rcph"><img src="'+av(nm)+'" alt=""></div><div class="rcb"><div class="rcname">'+e(nm)+'</div><div class="rcrole">'+e(r.role||'')+'&nbsp;&middot;&nbsp;'+e(r.co||'')+'</div><div class="rcmeta">'+e(avail)+'</div>'+(topics.length?'<div class="rcmuts">'+topics.map(function(t){return '<span class="rcmut">'+e(t)+'</span>';}).join('')+'</div>':'')+'</div><div class="rca"><button class="rcbtn rcbtn-p" data-meet="'+e(nm)+'">Meet</button></div></div>';
 }
 function sessionCard(item) {
   var tl=item.title,r=SS[tl]||{},tm=r.time||'',pts=tm.split(':'),th=pts[0]||'--',tm2=pts[1]||'00',inAg=r.inAgenda||false,tag=r.tag||null;
@@ -378,8 +391,8 @@ function sessionCard(item) {
   return '<div class="rc" data-ct="session" data-stitle="'+e(tl)+'"><div class="rctm"><div class="rch">'+e(th)+'</div><div class="rcm">'+e(tm2)+'</div></div><div class="rcb">'+tagh+'<div class="rcname">'+e(tl)+'</div><div class="rcrole">'+e(r.room||'')+(r.spk?' &middot; '+e(r.spk):'')+'</div></div><div class="rca"><button class="rcbtn '+(inAg?'':'rcbtn-a')+'" data-ag="'+e(tl)+'" data-ia="'+(inAg?'1':'0')+'">'+(inAg?'&#10003; Saved':'+ Add')+'</button></div></div>';
 }
 function speakerCard(item) {
-  var nm=item.name,r=SP[nm]||{},seed=r.seed!=null?r.seed:0;
-  return '<div class="rc" data-ct="speaker" data-cn="'+e(nm)+'"><div class="rcph"><img src="'+av(seed)+'" alt=""></div><div class="rcb"><div class="rcname">'+e(nm)+'</div><div class="rcrole">'+e(r.title||'')+'&nbsp;&middot;&nbsp;'+e(r.co||'')+'</div><div class="rcmeta">'+e(r.session||'')+'</div></div><div class="rca"><button class="rcbtn" data-follow="'+e(nm)+'">Follow</button></div></div>';
+  var nm=item.name,r=SP[nm]||{};
+  return '<div class="rc" data-ct="speaker" data-cn="'+e(nm)+'"><div class="rcph"><img src="'+av(nm)+'" alt=""></div><div class="rcb"><div class="rcname">'+e(nm)+'</div><div class="rcrole">'+e(r.title||'')+'&nbsp;&middot;&nbsp;'+e(r.co||'')+'</div><div class="rcmeta">'+e(r.session||'')+'</div></div><div class="rca"><button class="rcbtn" data-follow="'+e(nm)+'">Follow</button></div></div>';
 }
 function cardHTML(item){if(item.t==='person')return personCard(item);if(item.t==='session')return sessionCard(item);if(item.t==='speaker')return speakerCard(item);return '';}
 
@@ -626,8 +639,8 @@ function closePeek(){g('pscrim').classList.remove('open');g('psheet').classList.
 
 function openPeek(type,name){
   var r=type==='person'?(PP[name]||{}):(SP[name]||{});
-  var seed=r.seed!=null?r.seed:0,topics=r.topics||[];
-  g('phead').innerHTML='<div class="pph"><img src="'+av(seed)+'" alt=""></div><div class="pinfo"><div class="pname">'+e(name)+'</div><div class="psub">'+e(r.role||r.title||'')+'&nbsp;&middot;&nbsp;'+e(r.co||'')+'</div><div class="ptags">'+topics.map(function(t){return '<span class="ptag">'+e(t)+'</span>';}).join('')+'</div></div>';
+  var topics=r.topics||[];
+  g('phead').innerHTML='<div class="pph"><img src="'+av(name)+'" alt=""></div><div class="pinfo"><div class="pname">'+e(name)+'</div><div class="psub">'+e(r.role||r.title||'')+'&nbsp;&middot;&nbsp;'+e(r.co||'')+'</div><div class="ptags">'+topics.map(function(t){return '<span class="ptag">'+e(t)+'</span>';}).join('')+'</div></div>';
   var bh='<div>';
   if(r.bio)bh+='<div class="pr"><div class="pri"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M5 21v-2a7 7 0 0 1 14 0v2"/></svg></div><div><div class="prl">About</div><div class="prv" style="font-size:12px;font-weight:500;line-height:1.5">'+e(r.bio)+'</div></div></div>';
   if(type==='person'){
@@ -678,10 +691,10 @@ function openDetail(type,key){
   var dscroll=g('dscroll'),dntitle=g('dntitle'),dnact=g('dnact');
   var newAct=dnact.cloneNode(true); dnact.parentNode.replaceChild(newAct,dnact); var na=g('dnact');
   if(type==='person'){
-    var r=PP[key]||{},seed=r.seed!=null?r.seed:0,topics=r.topics||[];
+    var r=PP[key]||{},topics=r.topics||[];
     dntitle.textContent='Attendee profile'; na.textContent='Connect';
     na.addEventListener('click',function(){cdAsk('Send a connection request to '+key);});
-    dscroll.innerHTML='<div class="dbanner"><div class="dbbg" style="background:linear-gradient(135deg,#1A1915,#2D1A4A)"></div><div style="position:absolute;bottom:0;left:0;right:0;padding:0 18px 16px;display:flex;align-items:flex-end;gap:14px"><div style="width:68px;height:68px;border-radius:50%;overflow:hidden;border:3px solid rgba(255,255,255,.2);flex-shrink:0"><img src="'+av(seed)+'" style="width:100%;height:100%;object-fit:cover"></div><div><div style="font-size:20px;font-weight:800;color:#FFF;letter-spacing:-.5px">'+e(key)+'</div><div style="font-size:13px;font-weight:500;color:rgba(255,255,255,.65);margin-top:3px">'+e(r.role||'')+'&nbsp;&middot;&nbsp;'+e(r.co||'')+'</div></div></div></div>'
+    dscroll.innerHTML='<div class="dbanner"><div class="dbbg" style="background:linear-gradient(135deg,#1A1915,#2D1A4A)"></div><div style="position:absolute;bottom:0;left:0;right:0;padding:0 18px 16px;display:flex;align-items:flex-end;gap:14px"><div style="width:68px;height:68px;border-radius:50%;overflow:hidden;border:3px solid rgba(255,255,255,.2);flex-shrink:0"><img src="'+av(key)+'" style="width:100%;height:100%;object-fit:cover"></div><div><div style="font-size:20px;font-weight:800;color:#FFF;letter-spacing:-.5px">'+e(key)+'</div><div style="font-size:13px;font-weight:500;color:rgba(255,255,255,.65);margin-top:3px">'+e(r.role||'')+'&nbsp;&middot;&nbsp;'+e(r.co||'')+'</div></div></div></div>'
       +'<div style="padding:16px 18px 0"><div class="dstats"><div class="dstat"><div class="dsv">'+(r.score?r.score+'%':'--')+'</div><div class="dsl">Match</div></div><div class="dstat"><div class="dsv">'+((r.sessions||[]).length||'--')+'</div><div class="dsl">Sessions</div></div><div class="dstat"><div class="dsv">'+((r.slots||[]).length||'--')+'</div><div class="dsl">Slots</div></div></div></div>'
       +(r.bio?'<div class="dsec"><div class="dstitle">About</div><div class="dcard" style="font-size:13px;font-weight:500;line-height:1.6;color:var(--t2)">'+e(r.bio)+'</div></div>':'')
       +(topics.length?'<div class="dsec"><div class="dstitle">Shared interests</div><div class="dcard"><div style="display:flex;flex-wrap:wrap;gap:6px">'+topics.map(function(t){return '<span style="background:var(--accent-soft);color:var(--accent);font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px">'+e(t)+'</span>';}).join('')+'</div></div></div>':'')
@@ -690,11 +703,11 @@ function openDetail(type,key){
     g('d-meet').addEventListener('click',function(){cdAsk('Request a meeting with '+key);});
     g('d-msg').addEventListener('click',function(){cdAsk('Send a message to '+key);});
   } else if(type==='speaker'){
-    var rs=SP[key]||{},sseed=rs.seed!=null?rs.seed:0;
+    var rs=SP[key]||{};
     var fk=(rs.followers||0)>1000?Math.round((rs.followers||0)/1000)+'k':(rs.followers||0);
     dntitle.textContent='Speaker profile'; na.textContent='Follow';
     na.addEventListener('click',function(){cdAsk('Follow '+key);});
-    dscroll.innerHTML='<div class="dbanner"><div class="dbbg" style="background:linear-gradient(135deg,#1A1915,#0B2D80)"></div><div style="position:absolute;bottom:0;left:0;right:0;padding:0 18px 16px;display:flex;align-items:flex-end;gap:14px"><div style="width:68px;height:68px;border-radius:50%;overflow:hidden;border:3px solid rgba(255,255,255,.2);flex-shrink:0"><img src="'+av(sseed)+'" style="width:100%;height:100%;object-fit:cover"></div><div><div style="font-size:20px;font-weight:800;color:#FFF;letter-spacing:-.5px">'+e(key)+'</div><div style="font-size:13px;font-weight:500;color:rgba(255,255,255,.65);margin-top:3px">'+e(rs.title||'')+' at '+e(rs.co||'')+'</div>'+(rs.tw?'<div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:3px">'+e(rs.tw)+'</div>':'')+'</div></div></div>'
+    dscroll.innerHTML='<div class="dbanner"><div class="dbbg" style="background:linear-gradient(135deg,#1A1915,#0B2D80)"></div><div style="position:absolute;bottom:0;left:0;right:0;padding:0 18px 16px;display:flex;align-items:flex-end;gap:14px"><div style="width:68px;height:68px;border-radius:50%;overflow:hidden;border:3px solid rgba(255,255,255,.2);flex-shrink:0"><img src="'+av(key)+'" style="width:100%;height:100%;object-fit:cover"></div><div><div style="font-size:20px;font-weight:800;color:#FFF;letter-spacing:-.5px">'+e(key)+'</div><div style="font-size:13px;font-weight:500;color:rgba(255,255,255,.65);margin-top:3px">'+e(rs.title||'')+' at '+e(rs.co||'')+'</div>'+(rs.tw?'<div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:3px">'+e(rs.tw)+'</div>':'')+'</div></div></div>'
       +'<div style="padding:16px 18px 0"><div class="dstats"><div class="dstat"><div class="dsv">'+fk+'</div><div class="dsl">Followers</div></div><div class="dstat"><div class="dsv">'+(rs.talks||'--')+'</div><div class="dsl">Talks</div></div></div></div>'
       +(rs.bio?'<div class="dsec"><div class="dstitle">About</div><div class="dcard" style="font-size:13px;font-weight:500;line-height:1.6;color:var(--t2)">'+e(rs.bio)+'</div></div>':'')
       +(rs.session?'<div class="dsec"><div class="dstitle">Speaking at Web Summit</div><div class="dcard spkchip" id="d-sess"><div style="width:36px;height:36px;border-radius:9px;background:var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div><div><div class="spkchip-name">'+e(rs.session)+'</div><div class="spkchip-role">'+e(rs.stime||'')+'&nbsp;&middot;&nbsp;Tap to view</div></div></div></div>':'')
@@ -712,13 +725,12 @@ function openDetail(type,key){
     else if(rse.tag==='next') tagh2='<div style="margin-bottom:8px"><span style="font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:rgba(243,12,95,.10);color:var(--accent);padding:4px 10px;border-radius:999px">Up next</span></div>';
     dntitle.textContent=rse.track||'Session'; na.textContent=inAg?'Saved':'+ Add'; na.style.color=inAg?'var(--t3)':'var(--accent)';
     na.addEventListener('click',function(){cdAsk((inAg?'Remove ':'Add ')+key+(inAg?' from':' to')+' my agenda');});
-    var spkSeed=rse.spkSeed!=null?rse.spkSeed:0;
     dscroll.innerHTML='<div class="dbanner"><div class="dbbg" style="background:linear-gradient('+grad+')"></div><div style="position:absolute;bottom:0;left:0;right:0;padding:0 18px 16px">'+tagh2+'<div style="font-size:22px;font-weight:800;letter-spacing:-.6px;line-height:1.15;color:'+(isK?'#FFF':'var(--t1)')+'">'+e(key)+'</div><div style="font-size:12.5px;font-weight:500;color:'+(isK?'rgba(255,255,255,.65)':'var(--t2)')+';margin-top:5px">'+e(rse.time||'')+'&nbsp;&middot;&nbsp;'+e(rse.room||'')+'&nbsp;&middot;&nbsp;'+e(rse.dur||'45 min')+'</div></div></div>'
       +'<div style="padding:16px 18px 0"><div class="dstats"><div class="dstat"><div class="dsv">'+(rse.att||'--')+'</div><div class="dsl">Going</div></div><div class="dstat"><div class="dsv">'+(rse.cap||'--')+'</div><div class="dsl">Capacity</div></div>'+(rse.att&&rse.cap?'<div class="dstat" style="background:var(--accent-soft)"><div class="dsv" style="color:var(--accent)">'+Math.round(rse.att/rse.cap*100)+'%</div><div class="dsl" style="color:var(--accent)">Full</div></div>':'')+'</div></div>'
       +(rse.desc?'<div class="dsec"><div class="dstitle">About this session</div><div class="dcard" style="font-size:13px;font-weight:500;line-height:1.6;color:var(--t2)">'+e(rse.desc)+'</div></div>':'')
       +((rse.learn||[]).length?'<div class="dsec"><div class="dstitle">What you will learn</div><div class="dcard">'+rse.learn.map(function(l){return '<div class="dr"><div class="dri" style="color:var(--accent);background:var(--accent-soft)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div><div class="drv" style="font-weight:500">'+e(l)+'</div></div></div>';}).join('')+'</div></div>':'')
       +(rse.why?'<div class="dsec"><div class="dstitle">Bizzy says</div><div class="dcard" style="display:flex;gap:10px;align-items:flex-start"><div style="width:32px;height:32px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="13" height="13" viewBox="0 0 24 24" fill="white"><path d="M12 2L13.5 8.5L20 10L13.5 11.5L12 18L10.5 11.5L4 10L10.5 8.5Z"/></svg></div><div style="font-size:13px;font-weight:500;line-height:1.55;color:var(--t2)">'+e(rse.why)+'</div></div></div>':'')
-      +(rse.spk?'<div class="dsec"><div class="dstitle">Speaker</div><div class="dcard spkchip" id="d-spk"><img src="'+av(spkSeed)+'" alt=""><div><div class="spkchip-name">'+e(rse.spk)+'</div><div class="spkchip-role">Tap to view full profile</div></div></div></div>':'')
+      +(rse.spk?'<div class="dsec"><div class="dstitle">Speaker</div><div class="dcard spkchip" id="d-spk"><img src="'+av(rse.spk)+'" alt=""><div><div class="spkchip-name">'+e(rse.spk)+'</div><div class="spkchip-role">Tap to view full profile</div></div></div></div>':'')
       +'<div style="height:90px"></div><div class="dcta"><button class="pbtn '+(inAg?'pbtn-s':'pbtn-a')+'" style="flex:2" id="d-ag">'+(inAg?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> In your agenda':'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add to agenda')+'</button><button class="pbtn pbtn-s" style="flex:1" id="d-dir">Directions</button></div>';
     g('d-ag').addEventListener('click',function(){cdAsk((inAg?'Remove ':'Add ')+key+(inAg?' from':' to')+' my agenda');});
     g('d-dir').addEventListener('click',function(){cdAsk('How do I get to '+(rse.room||'the venue')+'?');});
