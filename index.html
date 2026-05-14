@@ -112,6 +112,10 @@ body {
 .tybub span:nth-child(2){animation-delay:.15s}.tybub span:nth-child(3){animation-delay:.3s}
 @keyframes tb{0%,60%,100%{transform:translateY(0);background:var(--t4)}30%{transform:translateY(-5px);background:var(--accent)}}
 .spad { height: 16px; flex-shrink: 0; }
+.preload-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.1px; text-transform: uppercase;
+  color: var(--t3); padding: 4px 16px 8px; margin-top: 6px;
+}
 .cfw { background: #FFF; border: 1px solid var(--border); border-radius: var(--rmd); padding: 12px 14px; }
 .cfp { font-size: 12.5px; font-weight: 500; color: var(--t2); line-height: 1.5; margin-bottom: 10px; }
 .cfbtns { display: flex; gap: 7px; }
@@ -400,6 +404,31 @@ function renderChat() {
   var out='';
   out+='<div class="bgreet">'+bav()+'<div class="gbub">'+e(GREET)+'</div></div>';
   if (!S.thread.length&&!S.typing) {
+    // Pre-loaded: upcoming sessions
+    out+='<div class="preload-label">Up next for you</div>';
+    out+='<div class="cwrap">'
+      +sessionCard({title:'Building Sustainable Cities'})
+      +sessionCard({title:'AI in Product Design'})
+      +sessionCard({title:'Networking Mixer'})
+      +sessionCard({title:'Closing Keynote'})
+    +'</div>';
+    out+='<div class="chips" style="margin-bottom:18px">'
+      +'<button class="chip" data-prompt="Add all to agenda">+ Add all</button>'
+      +'<button class="chip" data-prompt="What is on now?">What is on now?</button>'
+    +'</div>';
+    // Pre-loaded: people to meet
+    out+='<div class="preload-label">People to meet</div>';
+    out+='<div class="cwrap">'
+      +personCard({name:'Alex Chen'})
+      +personCard({name:'Priya Shah'})
+      +personCard({name:'Dana Goldberg'})
+      +personCard({name:'Tom Reyes'})
+    +'</div>';
+    out+='<div class="chips" style="margin-bottom:18px">'
+      +'<button class="chip" data-prompt="Who is free right now?">Free right now</button>'
+      +'<button class="chip" data-prompt="Designers only">Designers only</button>'
+    +'</div>';
+    // Prompt chips
     out+='<div class="prow">'+SUGG.map(function(s){return '<button class="pchip" data-prompt="'+e(s)+'"><span class="picon">'+SPARK+'</span>'+e(s)+'</button>';}).join('')+'</div>';
   }
   for (var i=0;i<S.thread.length;i++) {
