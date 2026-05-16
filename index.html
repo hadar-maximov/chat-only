@@ -122,6 +122,17 @@ body {
 .cfbtn { flex: 1; font-family: var(--font); font-size: 12.5px; font-weight: 700; padding: 9px; border-radius: 10px; border: 1px solid var(--border); background: #FFF; color: var(--t1); cursor: pointer; }
 .cfbtn.p { background: var(--t1); color: #FFF; border-color: var(--t1); }
 
+/* ── New conversation button ── */
+.newconv-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font); font-size: 12px; font-weight: 700;
+  color: var(--t2); background: var(--sf2);
+  border: 1.5px solid var(--border); border-radius: 999px;
+  padding: 8px 13px; cursor: pointer; white-space: nowrap; flex-shrink: 0;
+  transition: background .15s, border-color .15s, color .15s, opacity .2s;
+}
+.newconv-btn:active { background: var(--accent-soft); border-color: var(--accent-mid); color: var(--accent); }
+
 /* ── Sticky bottom bar ── */
 .bottom-bar {
   flex-shrink: 0;
@@ -261,7 +272,6 @@ body {
       Bizzy <span class="ldot"></span>
     </div>
     <div class="bline"></div>
-    <button class="rbtn" id="rbtn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></button>
   </div>
   <div id="chat"></div>
   <div class="spad"></div>
@@ -269,6 +279,10 @@ body {
 
 <div class="bottom-bar">
   <div class="ibar">
+    <button class="newconv-btn" id="rbtn" style="display:none">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+      New chat
+    </button>
     <input type="text" class="ifield" id="inp" placeholder="Ask Bizzy anything..." autocomplete="off" autocorrect="off" spellcheck="false">
     <button class="sbtn" id="sbtn">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
@@ -448,6 +462,7 @@ function renderChat() {
   if (S.typing) out+='<div class="tyrow">'+bav()+'<div class="tybub"><span></span><span></span><span></span></div></div>';
   g('chat').innerHTML=out;
   bindChat(g('chat'));
+  var rbt=g('rbtn'); if(rbt) rbt.style.display=S.thread.length?'inline-flex':'none';
   requestAnimationFrame(function(){var cs=g('cs');cs.scrollTop=cs.scrollHeight;});
 }
 
@@ -776,7 +791,7 @@ inp.addEventListener('focus',function(){
 
 g('dback').addEventListener('click',closeDetail);
 g('pscrim').addEventListener('click',closePeek);
-g('rbtn').addEventListener('click',function(){S.thread=[];S.asc=null;renderSC();renderChat();});
+g('rbtn').addEventListener('click',function(){S.thread=[];S.asc=null;renderSC();renderChat();var cs=g('cs');if(cs)cs.scrollTop=0;});
 g('sbtn').addEventListener('click',function(){var v=inp.value.trim();if(!v)return;inp.value='';ask(v);});
 inp.addEventListener('keydown',function(ev){if(ev.key==='Enter'){var v=inp.value.trim();if(!v)return;inp.value='';ask(v);}});
 
